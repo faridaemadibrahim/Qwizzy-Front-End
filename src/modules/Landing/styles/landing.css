@@ -1,0 +1,112 @@
+/* QuizMaster landing — theme + reusable patterns (single source of truth) */
+.landing-page {
+  --qm-purple: #7c3aed;
+  --qm-purple-deep: #6d28d9;
+  --qm-purple-bright: #8b5cf6;
+  --qm-text: #1f2937;
+  --qm-text-muted: #6b7280;
+  --qm-border: #e5e7eb;
+  --qm-stats-bg: #f3e8ff;
+  --qm-gradient-start: #7e3af2;
+  --qm-gradient-end: #a435f0;
+
+  color: var(--qm-text);
+  background: #fff;
+}
+
+.landing-page .text-qm-muted {
+  color: var(--qm-text-muted);
+}
+
+.landing-page .text-qm-purple {
+  color: var(--qm-purple);
+}
+
+.landing-page .bg-qm-purple {
+  background-color: var(--qm-purple);
+}
+
+.landing-page .border-qm-light {
+  border-color: var(--qm-border) !important;
+}
+
+.landing-page .navbar-brand-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.landing-page .navbar-brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-page .btn-qm-primary {
+  --bs-btn-bg: var(--qm-purple);
+  --bs-btn-border-color: var(--qm-purple);
+  --bs-btn-hover-bg: var(--qm-purple-deep);
+  --bs-btn-hover-border-color: var(--qm-purple-deep);
+  --bs-btn-active-bg: var(--qm-purple-deep);
+  --bs-btn-active-border-color: var(--qm-purple-deep);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+}
+
+.landing-page .btn-qm-outline {
+  color: var(--qm-text);
+  border-color: var(--qm-border);
+  background: #fff;
+}
+
+.landing-page .btn-qm-outline:hover {
+  border-color: var(--qm-text-muted);
+  color: var(--qm-text);
+  background: #fff;
+}
+
+.landing-page .btn-qm-gradient {
+  color: #fff;
+  border: none;
+  background: linear-gradient(
+    90deg,
+    var(--qm-gradient-start),
+    var(--qm-gradient-end)
+  );
+  padding-inline: 2.5rem;
+}
+
+.landing-page .btn-qm-gradient:hover {
+  color: #fff;
+  filter: brightness(1.05);
+}
+
+.landing-page .feature-icon {
+  font-size: 1.75rem;
+  color: var(--qm-purple);
+  line-height: 1;
+}
+
+.landing-page .stats-panel {
+  background: var(--qm-stats-bg);
+  border-radius: 2rem;
+}
+
+.landing-page .stat-value {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--qm-purple);
+}
+
+.landing-page .feature-card {
+  border-radius: 1rem;
+}
+
+.landing-page .hero-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
