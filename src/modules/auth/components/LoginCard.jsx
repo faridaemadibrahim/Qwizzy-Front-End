@@ -1,15 +1,30 @@
 import { useId, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authCopy } from "../data/authContent.js";
+import { useAuth } from "../../../context/AuthContext.jsx";
+
+const DEMO_EMAIL = "demo@quiz.com";
+const DEMO_PASSWORD = "demo123";
 
 export default function LoginCard() {
   const emailId = useId();
   const passwordId = useId();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   function handleSubmit(event) {
     event.preventDefault();
+    setError("");
+
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
+      login(email);
+      navigate("/quizzes");
+    } else {
+      setError("Invalid email or password. Try demo@quiz.com / demo123");
+    }
   }
 
   return (
@@ -68,6 +83,12 @@ export default function LoginCard() {
                 >
                   Sign In
                 </button>
+
+                {error && (
+                  <div className="alert alert-danger py-2 mt-3" role="alert">
+                    {error}
+                  </div>
+                )}
 
                 <p className="text-center small mb-0">
                   <span className="auth-muted">
