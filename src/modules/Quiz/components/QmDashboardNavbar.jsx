@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.jpg";
+import { useAuth } from "../../../context/useAuth.jsx";
 export default function QmDashboardNavbar({ user }) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
   return (
     <header>
       <nav className="navbar navbar-expand bg-white border-bottom qm-border-light py-3">
@@ -28,6 +37,7 @@ export default function QmDashboardNavbar({ user }) {
               title="Sign out"
               className="btn btn-link qm-text-muted p-0"
               style={{ fontSize: "1.2rem", lineHeight: 1 }}
+              onClick={handleLogout}
             >
               ↪
             </button>
