@@ -5,7 +5,7 @@ import QmBrandNavbar from "../components/QmBrandNavbar.jsx";
 export default function RootLayout() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
-  const hideAuthCtas = ["/login", "/forgot-password", "/register"].includes(
+  const hideAuthCtas = ["/login", "/forgot-password", "/reset-password", "/register"].includes(
     location.pathname,
   );
 

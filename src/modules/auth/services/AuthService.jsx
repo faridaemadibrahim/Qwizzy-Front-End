@@ -12,3 +12,6 @@ export const verifyEmail = (payload) => {
 export const forgotPassword = (email) => {
   return api.post("/users/forgot-password", { email });
 };
+export const resetPassword = (payload) => {
+  return api.post("/users/reset-password", payload);
+};
