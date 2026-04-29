@@ -1,30 +1,18 @@
 import { useId, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { authCopy } from "../data/authContent.js";
-import { useAuth } from "../../../context/useAuth.jsx";
-
-const DEMO_EMAIL = "demo@quiz.com";
-const DEMO_PASSWORD = "demo123";
+import useLogin from "../hooks/useLogin";
 
 export default function LoginCard() {
   const emailId = useId();
   const passwordId = useId();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const { handleLogin, error, loading } = useLogin();
 
   function handleSubmit(event) {
     event.preventDefault();
-    setError("");
-
-    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
-      login(email);
-      navigate("/quizzes");
-    } else {
-      setError("Invalid email or password. Try demo@quiz.com / demo123");
-    }
+    handleLogin({ email, password });
   }
 
   return (
@@ -80,20 +68,23 @@ export default function LoginCard() {
                 <button
                   type="submit"
                   className="btn btn-qm-primary btn-lg rounded-3 mt-2"
+                  disabled={loading}
                 >
-                  Sign In
+                  {loading ? "Signing in..." : "Sign In"}
                 </button>
 
                 {error && (
-                  <div className="alert alert-danger py-2 mt-3" role="alert">
+                  <div className="alert alert-danger py-2 mt-1" role="alert">
                     {error}
                   </div>
                 )}
+
                 <div>
-                  <Link to="/forgot-password fw-semibold" className="link-qm">
+                  <Link to="/forgot-password" className="link-qm fw-semibold">
                     Forgot Password?
                   </Link>
                 </div>
+
                 <p className="text-center small mb-0">
                   <span className="auth-muted">
                     Don&apos;t have an account?
