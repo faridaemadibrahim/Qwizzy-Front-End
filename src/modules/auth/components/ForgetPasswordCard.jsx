@@ -1,19 +1,18 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 import { Link } from "react-router-dom";
 import { authCopyForgetPassword } from "../data/authContent.js";
-
-const DEMO_EMAIL = "demo@quiz.com";
-const DEMO_PASSWORD = "demo123";
+import useForgetPassword from "../hooks/useForgetPassword.js";
 
 export default function ForgetPasswordCard() {
   const emailId = useId();
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    setError("");
-  }
+  const {
+    email,
+    setEmail,
+    error,
+    success,
+    loading,
+    handleSubmit,
+  } = useForgetPassword();
 
   return (
     <section className="container auth-shell">
@@ -51,13 +50,19 @@ export default function ForgetPasswordCard() {
                 <button
                   type="submit"
                   className="btn btn-qm-primary btn-lg rounded-3 mt-2"
+                  disabled={loading}
                 >
-                  Send Reset Code{" "}
+                  {loading ? "Sending..." : "Send Reset Code"}
                 </button>
 
                 {error && (
                   <div className="alert alert-danger py-2 mt-3" role="alert">
                     {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="alert alert-success py-2 mt-3" role="alert">
+                    {success}
                   </div>
                 )}
 
