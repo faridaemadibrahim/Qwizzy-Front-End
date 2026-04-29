@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { resetPassword } from "../services/AuthService.jsx";
+import { resetPassword } from "../services/AuthService.js";
 
 export default function useResetPassword() {
     const [newPassword, setNewPassword] = useState("");
