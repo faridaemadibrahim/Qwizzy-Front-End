@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import QmDashboardNavbar from "../components/QmDashboardNavbar";
 import StatCard from "../components/StatCard";
 import QuizCard from "../components/QuizCard";
-import { useAuth } from "../../../context/AuthContext.jsx";
+import { useAuth } from "../../../context/useAuth.jsx";
 
 import { stats, quizzes, difficultyFilters } from "../data/QuizzesContent";
 

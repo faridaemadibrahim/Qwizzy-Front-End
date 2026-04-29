@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom'
 
 import logo from '../assets/logo.jpg'
 
-export default function QmBrandNavbar() {
+export default function QmBrandNavbar({ hideAuthCtas = false }) {
   return (
     <header>
       <nav className="navbar navbar-expand bg-white border-bottom qm-border-light py-3">
@@ -17,14 +17,16 @@ export default function QmBrandNavbar() {
             Qwizzy
           </Link>
 
-          <div className="ms-auto d-flex align-items-center gap-3">
-            <NavLink className="qm-navlink small fw-medium" to="/login">
-              Sign In
-            </NavLink>
-            <a className="btn btn-qm-primary rounded-3 px-4" href="/#get-started">
-              Get Started
-            </a>
-          </div>
+          {!hideAuthCtas && (
+            <div className="ms-auto d-flex align-items-center gap-3">
+              <NavLink className="qm-navlink small fw-medium" to="/login">
+                Sign In
+              </NavLink>
+              <a className="btn btn-qm-primary rounded-3 px-4" href="/#get-started">
+                Get Started
+              </a>
+            </div>
+          )}
         </div>
       </nav>
     </header>

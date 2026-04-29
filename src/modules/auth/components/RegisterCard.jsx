@@ -1,5 +1,7 @@
 import { useId, useState } from "react";
 import { Link } from "react-router-dom";
+import useRegister from "../hooks/useRegister";
+
 export default function RegisterCard() {
   const nameId = useId();
   const emailId = useId();
@@ -10,20 +12,18 @@ export default function RegisterCard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+
+  const { handleRegister, error, loading } = useRegister();
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-    setError("");
-    // TODO: handle registration logic
+
+    handleRegister({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
   }
 
   return (
@@ -33,20 +33,19 @@ export default function RegisterCard() {
           <div className="card auth-card border-0 shadow-lg">
             <div className="card-body p-4 p-md-5">
               <h1 className="h4 fw-bold text-center mb-2">Create Account</h1>
+
               <p className="auth-muted text-center small mb-4">
                 Start your learning journey today
               </p>
 
               <form onSubmit={handleSubmit} className="d-grid gap-3">
                 {error && (
-                  <div
-                    className="alert alert-danger py-2 small mb-0"
-                    role="alert"
-                  >
+                  <div className="alert alert-danger py-2 small mb-0">
                     {error}
                   </div>
                 )}
 
+                {/* Name */}
                 <div>
                   <label
                     htmlFor={nameId}
@@ -61,11 +60,11 @@ export default function RegisterCard() {
                     placeholder="John Doe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    autoComplete="name"
                     required
                   />
                 </div>
 
+                {/* Email */}
                 <div>
                   <label
                     htmlFor={emailId}
@@ -80,11 +79,11 @@ export default function RegisterCard() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
                     required
                   />
                 </div>
 
+                {/* Password */}
                 <div>
                   <label
                     htmlFor={passwordId}
@@ -99,18 +98,11 @@ export default function RegisterCard() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="new-password"
                     required
-                    minLength={6}
                   />
-                  <div
-                    className="form-text auth-muted"
-                    style={{ fontSize: "0.78rem" }}
-                  >
-                    At least 6 characters
-                  </div>
                 </div>
 
+                {/* Confirm Password */}
                 <div>
                   <label
                     htmlFor={confirmPasswordId}
@@ -125,16 +117,17 @@ export default function RegisterCard() {
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
                     required
                   />
                 </div>
 
+                {/* Submit */}
                 <button
                   type="submit"
                   className="btn btn-qm-primary btn-lg rounded-3 mt-2"
+                  disabled={loading}
                 >
-                  Create Account
+                  {loading ? "Creating..." : "Create Account"}
                 </button>
 
                 <p className="text-center small mb-0">

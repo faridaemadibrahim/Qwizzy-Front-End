@@ -1,8 +1,17 @@
 .auth-page {
   min-height: 100vh;
   color: #1f2937;
-  background: radial-gradient(1200px 600px at 0% 0%, rgba(124, 58, 237, 0.08), transparent 55%),
-    radial-gradient(1000px 600px at 100% 40%, rgba(124, 58, 237, 0.06), transparent 55%),
+  background:
+    radial-gradient(
+      1200px 600px at 0% 0%,
+      rgba(124, 58, 237, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      1000px 600px at 100% 40%,
+      rgba(124, 58, 237, 0.06),
+      transparent 55%
+    ),
     #fff;
 }
 
@@ -42,6 +51,7 @@
 
 .link-qm {
   color: var(--qm-purple);
+  text-decoration: none;
 }
 
 .link-qm:hover {
@@ -63,8 +73,17 @@
 
   min-height: 100vh;
   color: var(--qm-text);
-  background: radial-gradient(1200px 600px at 0% 0%, rgba(124, 58, 237, 0.08), transparent 55%),
-    radial-gradient(1000px 600px at 100% 40%, rgba(124, 58, 237, 0.06), transparent 55%),
+  background:
+    radial-gradient(
+      1200px 600px at 0% 0%,
+      rgba(124, 58, 237, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      1000px 600px at 100% 40%,
+      rgba(124, 58, 237, 0.06),
+      transparent 55%
+    ),
     #fff;
 }
 

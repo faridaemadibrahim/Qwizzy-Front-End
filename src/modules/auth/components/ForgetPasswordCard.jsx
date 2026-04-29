@@ -1,30 +1,18 @@
 import { useId, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { authCopy } from "../data/authContent.js";
-import { useAuth } from "../../../context/useAuth.jsx";
+import { Link } from "react-router-dom";
+import { authCopyForgetPassword } from "../data/authContent.js";
 
 const DEMO_EMAIL = "demo@quiz.com";
 const DEMO_PASSWORD = "demo123";
 
-export default function LoginCard() {
+export default function ForgetPasswordCard() {
   const emailId = useId();
-  const passwordId = useId();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth();
 
   function handleSubmit(event) {
     event.preventDefault();
     setError("");
-
-    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
-      login(email);
-      navigate("/quizzes");
-    } else {
-      setError("Invalid email or password. Try demo@quiz.com / demo123");
-    }
   }
 
   return (
@@ -33,9 +21,11 @@ export default function LoginCard() {
         <div className="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-5">
           <div className="card auth-card border-0 shadow-lg">
             <div className="card-body p-4 p-md-5">
-              <h1 className="h4 fw-bold text-center mb-2">{authCopy.title}</h1>
+              <h1 className="h4 fw-bold text-center mb-2">
+                {authCopyForgetPassword.title}
+              </h1>
               <p className="auth-muted text-center small mb-4">
-                {authCopy.subtitle}
+                {authCopyForgetPassword.subtitle}
               </p>
 
               <form onSubmit={handleSubmit} className="d-grid gap-3">
@@ -58,30 +48,11 @@ export default function LoginCard() {
                   />
                 </div>
 
-                <div>
-                  <label
-                    htmlFor={passwordId}
-                    className="form-label small fw-semibold"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id={passwordId}
-                    className="form-control form-control-lg"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="current-password"
-                    required
-                  />
-                </div>
-
                 <button
                   type="submit"
                   className="btn btn-qm-primary btn-lg rounded-3 mt-2"
                 >
-                  Sign In
+                  Send Reset Code{" "}
                 </button>
 
                 {error && (
@@ -89,20 +60,14 @@ export default function LoginCard() {
                     {error}
                   </div>
                 )}
-                <div>
-                  <Link to="/forgot-password fw-semibold" className="link-qm">
-                    Forgot Password?
-                  </Link>
-                </div>
+
                 <p className="text-center small mb-0">
-                  <span className="auth-muted">
-                    Don&apos;t have an account?
-                  </span>{" "}
+                  <span className="auth-muted">Remember your password ? </span>{" "}
                   <Link
                     className="link-qm fw-semibold text-decoration-none"
-                    to="/register"
+                    to="/login"
                   >
-                    Sign up here
+                    Sign in here
                   </Link>
                 </p>
               </form>
