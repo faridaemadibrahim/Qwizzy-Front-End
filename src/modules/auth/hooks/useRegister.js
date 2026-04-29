@@ -3,34 +3,43 @@ import { registerUser } from "../services/AuthService.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function useRegister() {
-    const [error, setError] = useState("");
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     async function handleRegister({ name, email, password, confirmPassword }) {
-        if (password.length < 6) {
-            setError("Password must be at least 6 characters");
-            return;
-        }
+        const newErrors = {};
 
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
+        if (!name.trim()) newErrors.name = "Full name is required";
+
+        if (password.length < 8)
+            newErrors.password = "Password must be at least 8 characters";
+        else if (!/[A-Z]/.test(password))
+            newErrors.password = "Must contain at least one uppercase letter";
+        else if (!/[a-z]/.test(password))
+            newErrors.password = "Must contain at least one lowercase letter";
+        else if (!/[0-9]/.test(password))
+            newErrors.password = "Must contain at least one number";
+
+        if (password !== confirmPassword)
+            newErrors.confirmPassword = "Passwords do not match";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
 
         try {
             setLoading(true);
-            setError("");
-
+            setErrors({});
             await registerUser({ full_name: name, email, password });
-
-            navigate("/login");
+            navigate("/verify-email", { state: { email } });
         } catch (err) {
-            setError(err.response?.data?.message || "Error occurred");
+            setErrors({ api: err.response?.data?.message || "Error occurred" });
         } finally {
             setLoading(false);
         }
     }
 
-    return { handleRegister, error, loading };
+    return { handleRegister, errors, loading };
 }

@@ -13,7 +13,7 @@ export default function RegisterCard() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const { handleRegister, error, loading } = useRegister();
+  const { handleRegister, errors, loading } = useRegister();
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -39,9 +39,9 @@ export default function RegisterCard() {
               </p>
 
               <form onSubmit={handleSubmit} className="d-grid gap-3">
-                {error && (
+                {errors.api && (
                   <div className="alert alert-danger py-2 small mb-0">
-                    {error}
+                    {errors.api}
                   </div>
                 )}
 
@@ -55,13 +55,16 @@ export default function RegisterCard() {
                   </label>
                   <input
                     id={nameId}
-                    className="form-control form-control-lg"
+                    className={`form-control form-control-lg ${errors.name ? "is-invalid" : ""}`}
                     type="text"
                     placeholder="John Doe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                   />
+                  {errors.name && (
+                    <div className="invalid-feedback">{errors.name}</div>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -93,13 +96,16 @@ export default function RegisterCard() {
                   </label>
                   <input
                     id={passwordId}
-                    className="form-control form-control-lg"
+                    className={`form-control form-control-lg ${errors.password ? "is-invalid" : ""}`}
                     type="password"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  {errors.password && (
+                    <div className="invalid-feedback">{errors.password}</div>
+                  )}
                 </div>
 
                 {/* Confirm Password */}
@@ -112,13 +118,18 @@ export default function RegisterCard() {
                   </label>
                   <input
                     id={confirmPasswordId}
-                    className="form-control form-control-lg"
+                    className={`form-control form-control-lg ${errors.confirmPassword ? "is-invalid" : ""}`}
                     type="password"
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
+                  {errors.confirmPassword && (
+                    <div className="invalid-feedback">
+                      {errors.confirmPassword}
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit */}
