@@ -1,7 +1,7 @@
 import { useId, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/useAuth.jsx";
-import { verifyEmail as verifyEmailRequest } from "../services/AuthService.jsx";
+import { verifyEmail as verifyEmailRequest } from "../services/AuthService.js";
 
 const CODE_LENGTH = 4;
 const EXPIRY_SECONDS = 299;

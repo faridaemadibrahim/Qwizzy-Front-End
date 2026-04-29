@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/useAuth.jsx";
-import { loginUser } from "../services/AuthService.jsx";
+import { loginUser } from "../services/AuthService.js";
 import { mapLoginResponse } from "../../../utils/authMapper.js";
 
 export default function useLogin() {

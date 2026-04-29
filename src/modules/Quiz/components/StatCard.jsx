@@ -1,4 +1,7 @@
+import useGetUserStates from "../hooks/useGetUserStates";
+
 export default function StatCard({ label, value, emoji }) {
+
   return (
     <div className="card border-0 flex-grow-1 stat-card">
       <div className="card-body d-flex justify-content-between align-items-center p-4">

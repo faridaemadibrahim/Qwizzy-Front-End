@@ -5,8 +5,10 @@ import QmDashboardNavbar from "../components/QmDashboardNavbar";
 import StatCard from "../components/StatCard";
 import QuizCard from "../components/QuizCard";
 import { useAuth } from "../../../context/useAuth.jsx";
+import useQuizzes from "../hooks/useGetQuizzes";
 
-import { stats, quizzes, difficultyFilters } from "../data/QuizzesContent";
+import { difficultyFilters } from "../data/QuizzesContent.jsx";
+import useGetUserStates from "../hooks/useGetUserStates.js";
 
 import "../styles/QuizzesList.css";
 
@@ -14,6 +16,8 @@ export default function QuizzesList() {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const { quizzes, loading, error } = useQuizzes();
+  const { stats: userStats, loading: statsLoading } = useGetUserStates();
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -44,9 +48,13 @@ export default function QuizzesList() {
 
         {/* Stats */}
         <div className="d-flex flex-wrap gap-3 mb-5">
-          {stats.map((s) => (
-            <StatCard key={s.label} {...s} />
-          ))}
+          {statsLoading ? (
+            <div className="text-center w-100">Loading stats...</div>
+          ) : (
+            userStats.map((s) => (
+              <StatCard key={s.label} {...s} />
+            ))
+          )}
         </div>
 
         {/* Section header + filters */}
@@ -82,7 +90,15 @@ export default function QuizzesList() {
         </div>
 
         {/* Quiz grid */}
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-5 quizzes-empty">
+            <p>Loading quizzes...</p>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger py-3" role="alert">
+            {error}
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="row g-4">
             {filtered.map((quiz) => (
               <div className="col-12 col-md-6 col-lg-4" key={quiz.id}>

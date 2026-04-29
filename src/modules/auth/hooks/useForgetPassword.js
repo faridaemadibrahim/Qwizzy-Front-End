@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { forgotPassword } from "../services/AuthService.jsx";
+import { forgotPassword } from "../services/AuthService.js";
 
 export default function useForgetPassword() {
   const [email, setEmail] = useState("");
