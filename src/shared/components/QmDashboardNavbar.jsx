@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../../assets/logo.jpg";
-import { useAuth } from "../../../context/useAuth.jsx";
+import logo from "../../assets/logo.jpg";
+import { useAuth } from "../../context/useAuth.jsx";
 export default function QmDashboardNavbar({ user }) {
   const navigate = useNavigate();
   const { logout } = useAuth();

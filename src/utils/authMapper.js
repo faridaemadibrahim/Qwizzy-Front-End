@@ -69,5 +69,19 @@ export function mapLoginResponse(raw) {
                         : undefined
   );
 
-  return { token, email: email ?? "", name: name ?? "" };
+  const role = /** @type {string | undefined} */ (
+    typeof d.role === "string"
+      ? d.role
+      : userObj && typeof userObj.role === "string"
+        ? userObj.role
+        : typeof nested?.role === "string"
+          ? nested.role
+          : nestedUserObj && typeof nestedUserObj.role === "string"
+            ? nestedUserObj.role
+            : tokenPayload && typeof tokenPayload.role === "string"
+              ? tokenPayload.role
+              : undefined
+  );
+
+  return { token, email: email ?? "", name: name ?? "", role: role ?? "" };
 }

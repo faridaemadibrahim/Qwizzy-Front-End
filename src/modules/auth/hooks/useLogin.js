@@ -25,8 +25,14 @@ export default function useLogin() {
         token: auth.token,
         email: auth.email || email,
         name: auth.name,
+        role: auth.role,
       });
-      navigate("/quizzes");
+
+      if (auth.role === "admin" || auth.role === "instructor") {
+        navigate("/admin");
+      } else {
+        navigate("/quizzes");
+      }
     } catch (err) {
       const e = /** @type {{ response?: { data?: { message?: string } } }} */ (
         err

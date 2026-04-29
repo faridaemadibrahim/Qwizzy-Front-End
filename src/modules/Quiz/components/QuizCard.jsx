@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import DifficultyBadge from "./DifficultyBadge";
+import DifficultyBadge from "../../../shared/components/DifficultyBadge";
 
 function QuizCard({ quiz }) {
   return (
