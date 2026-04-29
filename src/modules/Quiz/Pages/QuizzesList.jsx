@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 
-import QmDashboardNavbar from "../components/QmDashboardNavbar";
-import StatCard from "../components/StatCard";
+import QmDashboardNavbar from "../../../shared/components/QmDashboardNavbar";
+import StatCard from "../../../shared/components/StatCard";
+import DashboardHeader from "../../../shared/components/DashboardHeader";
 import QuizCard from "../components/QuizCard";
 import { useAuth } from "../../../context/useAuth.jsx";
 import useQuizzes from "../hooks/useGetQuizzes";
@@ -36,15 +37,11 @@ export default function QuizzesList() {
       <QmDashboardNavbar user={user} />
 
       <main className="container py-5">
-        {/* Welcome */}
-        <div className="mb-5">
-          <h1 className="fw-bold mb-1" style={{ fontSize: "2rem" }}>
-            Welcome back, <span className="qm-text-purple">{user.name}</span>
-          </h1>
-          <p className="qm-text-muted">
-            Continue your learning journey with our curated quizzes
-          </p>
-        </div>
+        <DashboardHeader 
+          title="Welcome back" 
+          userName={user.name} 
+          description="Continue your learning journey with our curated quizzes" 
+        />
 
         {/* Stats */}
         <div className="d-flex flex-wrap gap-3 mb-5">

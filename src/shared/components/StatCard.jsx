@@ -1,4 +1,4 @@
-import useGetUserStates from "../hooks/useGetUserStates";
+import useGetUserStates from "../../modules/Quiz/hooks/useGetUserStates";
 
 export default function StatCard({ label, value, emoji }) {
 

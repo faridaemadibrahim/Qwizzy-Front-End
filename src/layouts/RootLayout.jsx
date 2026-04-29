@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 
-import QmBrandNavbar from "../components/QmBrandNavbar.jsx";
+import QmBrandNavbar from "../shared/components/QmBrandNavbar.jsx";
 
 export default function RootLayout() {
   const location = useLocation();

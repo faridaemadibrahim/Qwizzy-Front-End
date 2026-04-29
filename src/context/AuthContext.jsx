@@ -5,6 +5,7 @@ import {
   setStoredAuth,
 } from "../API/authStorage.js";
 import { AuthContext } from "./AuthContextObject.jsx";
+import { decodeJwtPayload } from "../utils/token.js";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => getStoredAuth()?.token ?? null);
@@ -14,21 +15,28 @@ export function AuthProvider({ children }) {
     return {
       email: stored.email,
       name: stored.name ?? "",
+      role: stored.role ?? "",
     };
   });
 
   const login = useCallback(({ token: nextToken, email, name }) => {
     if (!nextToken) return;
     setToken(nextToken);
+
+    const decoded = decodeJwtPayload(nextToken);
+    const role = decoded?.role || "";
+
     const nextUser = {
-      email: email ?? "",
-      name: name ?? "",
+      email: email ?? (typeof decoded?.email === "string" ? decoded.email : ""),
+      name: name ?? (typeof decoded?.name === "string" ? decoded.name : ""),
+      role: role,
     };
     setUser(nextUser);
     setStoredAuth({
       token: nextToken,
       email: nextUser.email || undefined,
       name: nextUser.name || undefined,
+      role: nextUser.role || undefined,
     });
   }, []);
 

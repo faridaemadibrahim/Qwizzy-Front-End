@@ -1,4 +1,4 @@
-import FeatureCard from './FeatureCard.jsx'
+import FeatureCard from "../../../shared/components/FeatureCard.jsx";
 
 export default function FeaturesSection({ group }) {
   if (!group?.items?.length) return null

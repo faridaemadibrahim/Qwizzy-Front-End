@@ -17,7 +17,7 @@ export default function LandingPage() {
         ))}
         <StatsSection />
         <CtaSection />
-      </main> 
+      </main>
       <LandingFooter />
     </div>
   )
