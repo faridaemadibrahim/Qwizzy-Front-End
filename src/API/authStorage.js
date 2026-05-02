@@ -1,6 +1,6 @@
 const STORAGE_KEY = "quizzy-auth";
 
-/** @typedef {{ token: string; email?: string; name?: string; role?: string }} StoredAuth */
+/** @typedef {{ token: string; id?: string; email?: string; name?: string; role?: string }} StoredAuth */
 
 /**
  * Read saved auth payload from localStorage (used after refresh and by axios).

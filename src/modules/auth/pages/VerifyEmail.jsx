@@ -1,5 +1,4 @@
 import "../styles/auth.css";
-
 import VerifyEmailCard from "../components/VerifyEmailCard.jsx";
 
 export default function VerifyEmail() {

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { getAllQuizzes } from "../services/quizService.js";
+import { useCallback, useEffect, useState } from "react";
+import { getAllQuizzes, getQuestionsByQuizId } from "../services/quizService.js";
 
 function normalizeQuiz(quiz, idx) {
   const normalizedTitle =
@@ -19,8 +19,8 @@ function normalizeQuiz(quiz, idx) {
     questions:
       quiz.questionsCount ??
       quiz.totalQuestions ??
-      quiz.questions ??
       quiz.question_count ??
+      (Array.isArray(quiz.questions) ? quiz.questions.length : quiz.questions) ??
       0,
     duration:
       quiz.duration ??
@@ -45,32 +45,27 @@ export default function useQuizzes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let active = true;
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const { data } = await getAllQuizzes();
+      const rawQuizzes = getQuizArray(data);
+      const normalized = rawQuizzes.map((q, i) => normalizeQuiz(q, i));
 
-    async function load() {
-      setLoading(true);
-      setError("");
-      try {
-        const { data } = await getAllQuizzes();
-        if (!active) return;
-        const normalized = getQuizArray(data).map((q, i) => normalizeQuiz(q, i));
-        setQuizzes(normalized);
-      } catch (err) {
-        if (!active) return;
-        setError(
-          err?.response?.data?.message || "Failed to load quizzes. Try again."
-        );
-      } finally {
-        if (active) setLoading(false);
-      }
+      setQuizzes(normalized);
+    } catch (err) {
+      setError(
+        err?.response?.data?.message || "Failed to load quizzes. Try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    load();
-    return () => {
-      active = false;
-    };
   }, []);
 
-  return { quizzes, loading, error };
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { quizzes, loading, error, refetch: load };
 }
