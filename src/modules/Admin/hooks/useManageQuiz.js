@@ -1,12 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
-import { getQuizById } from "../../Quiz/services/quizService";
-import {
-    createQuestion,
-    updateQuiz,
-    createQuestionOption,
-    getOptionsByQuestionId,
-    deleteQuestion,
-} from "../services/admin.api";
+import { getQuizById, getQuestionsByQuizId } from "../../Quiz/services/quizService";
+import { createQuestion, updateQuiz, createQuestionOption, getOptionsByQuestionId, deleteQuestion } from "../services/admin.api";
 
 function formatUpdateQuizError(err) {
     const body = err?.response?.data;
@@ -25,75 +19,135 @@ function formatUpdateQuizError(err) {
     return msg;
 }
 
-/**
- * GET /quizzes/:id → { success: true, data: [ rows ] }
- * Each row repeats quiz fields and carries one question (`id` = question id, `quiz_id` = quiz id).
- */
-function parseQuizWithQuestionsResponse(response) {
-    const envelope = response?.data;
-    if (!envelope || typeof envelope !== "object" || !envelope.success) return null;
-    if (!Array.isArray(envelope.data)) return null;
+/** Unwrap common API shapes around a single quiz object. */
+function unwrapQuizResponse(response) {
+    const body = response?.data;
+    if (!body || typeof body !== "object") return null;
 
-    const rows = envelope.data;
-    if (rows.length === 0) {
-        return { quiz: null, questionRows: [] };
+    const candidates = [
+        body.data?.quiz,
+        body.quiz,
+        body.result,
+        body.payload?.quiz,
+        typeof body.payload === "object" && body.payload?.id != null ? body.payload : null,
+        typeof body.data === "object" && body.data !== null && !Array.isArray(body.data)
+            ? body.data.quiz ?? body.data
+            : null,
+    ];
+
+    for (const raw of candidates) {
+        if (!raw || typeof raw !== "object" || Array.isArray(raw)) continue;
+        const looksLikeQuiz =
+            "id" in raw ||
+            "title" in raw ||
+            "questions" in raw ||
+            raw.name != null ||
+            raw.quiz_title != null;
+        if (looksLikeQuiz) return raw;
     }
 
-    const row0 = rows[0];
-    const quiz = {
-        id: row0.quiz_id,
-        category_id: row0.category_id,
-        title: row0.title,
-        description: row0.description ?? "",
-        created_by_user_id: row0.created_by_user_id,
-        is_published: row0.is_published,
-        time_limit_minutes: row0.time_limit_minutes,
-        difficulty: row0.difficulty,
-        created_at: row0.created_at,
-        updated_at: row0.updated_at,
+    return typeof body.data === "object" && body.data !== null && !Array.isArray(body.data)
+        ? body.data
+        : body;
+}
+
+/** Ensure title/category_id align with PUT validation after GET. */
+function normalizeFetchedQuiz(raw) {
+    if (!raw || typeof raw !== "object") return raw;
+    const pickTitle = (...cands) => {
+        for (const c of cands) {
+            if (typeof c === "string" && c.trim()) return c.trim();
+        }
+        return "";
     };
+    const titled = pickTitle(
+        raw.title,
+        raw.name,
+        raw.quiz_title,
+        raw.quizTitle,
+        raw.quiz_name
+    );
+    let category_id = raw.category_id ?? raw.categoryId;
+    if (category_id == null && raw.category != null) {
+        if (typeof raw.category === "object") category_id = raw.category.id;
+        else if (typeof raw.category === "number") category_id = raw.category;
+    }
+    return {
+        ...raw,
+        title: titled,
+        ...(category_id != null ? { category_id } : {}),
+    };
+}
 
-    const questionRows = rows.map((r) => ({
-        id: r.id,
-        quiz_id: r.quiz_id,
-        question_type: r.question_type,
-        body: r.body,
-        points: r.points,
-        sort_order: r.sort_order,
-    }));
+function categoryIdFromQuiz(quiz) {
+    if (!quiz) return undefined;
+    if (quiz.category_id != null && quiz.category_id !== "") return quiz.category_id;
+    if (quiz.category != null && typeof quiz.category === "object" && quiz.category.id != null) {
+        return quiz.category.id;
+    }
+    if (typeof quiz.category === "number") return quiz.category;
+    return undefined;
+}
 
-    return { quiz, questionRows };
+/** GET /quizzes/:id may use `questions`, `questions_list`, or nested shapes */
+function pickQuestionsArray(raw) {
+    if (!raw || typeof raw !== "object") return [];
+    const tries = [
+        raw.questions,
+        raw.questions_list,
+        raw.questionsList,
+        raw.question_list,
+        raw.quiz_questions,
+    ];
+    let emptyFallback = [];
+    for (const t of tries) {
+        if (!Array.isArray(t)) continue;
+        if (t.length > 0) return t;
+        emptyFallback = t;
+    }
+    return emptyFallback;
+}
+
+/** Prefer questions on quiz slice; walk common envelope nests */
+function resolveQuestions(quizSlice, envelope) {
+    const buckets = [quizSlice, envelope, envelope?.data].filter(
+        (b) => b && typeof b === "object"
+    );
+    for (const b of buckets) {
+        const arr = pickQuestionsArray(b);
+        if (arr.length > 0) return arr;
+    }
+    return [];
 }
 
 function normalizeManageOption(opt) {
-    if (opt == null || typeof opt !== "object") return { label: "", is_correct: false };
+    if (opt == null) return { label: "", is_correct: false };
+    if (typeof opt === "string") return { label: opt, is_correct: false };
     return {
-        label: String(opt.label ?? ""),
-        is_correct: Boolean(opt.is_correct),
+        label: String(
+            opt.label ?? opt.text ?? opt.option_text ?? opt.title ?? opt.value ?? ""
+        ),
+        is_correct: Boolean(opt.is_correct ?? opt.isCorrect ?? opt.correct),
     };
 }
 
 /** Shape expected by QuestionsList: body, question_type, points, options[{ label, is_correct }] */
 function normalizeManageQuestion(q) {
     if (!q || typeof q !== "object") return q;
-    const optRaw = Array.isArray(q.options) ? q.options : [];
-    const pointsNum = Number.parseFloat(String(q.points ?? "1"));
+    const optRaw = q.options ?? q.question_options ?? q.answers ?? [];
     return {
         ...q,
         id: q.id,
-        body: typeof q.body === "string" ? q.body : "",
-        question_type: q.question_type ?? "MCQ",
-        points: Number.isFinite(pointsNum) ? pointsNum : 1,
-        options: optRaw.map(normalizeManageOption),
+        body:
+            (typeof q.body === "string" && q.body) ||
+            (typeof q.text === "string" && q.text) ||
+            (typeof q.question_text === "string" && q.question_text) ||
+            (typeof q.content === "string" && q.content) ||
+            "",
+        question_type: q.question_type ?? q.type ?? "MCQ",
+        points: q.points ?? q.score ?? 1,
+        options: Array.isArray(optRaw) ? optRaw.map(normalizeManageOption) : [],
     };
-}
-
-/** Options list from GET /question-options/question/:id */
-function optionsFromResponse(optRes) {
-    const raw = optRes?.data;
-    if (Array.isArray(raw?.data)) return raw.data;
-    if (Array.isArray(raw)) return raw;
-    return [];
 }
 
 export default function useManageQuiz(quizId) {
@@ -103,6 +157,7 @@ export default function useManageQuiz(quizId) {
     const [questions, setQuestions] = useState([]);
     const [creatingQuestion, setCreatingQuestion] = useState(false);
 
+    /** Avoid applying an older GET after `quizId` changes mid-flight */
     const activeQuizIdRef = useRef(quizId);
     useLayoutEffect(() => {
         activeQuizIdRef.current = quizId;
@@ -114,6 +169,7 @@ export default function useManageQuiz(quizId) {
             setLoading(true);
             setError(null);
 
+            // 1. Fetch Quiz Metadata (Essential)
             let quizResponse;
             try {
                 quizResponse = await getQuizById(requestedId);
@@ -126,43 +182,44 @@ export default function useManageQuiz(quizId) {
 
             if (activeQuizIdRef.current !== requestedId) return;
 
-            const parsed = parseQuizWithQuestionsResponse(quizResponse);
-            if (!parsed) {
+            const quizData = normalizeFetchedQuiz(unwrapQuizResponse(quizResponse));
+            if (!quizData) {
                 setError("Quiz not found or invalid response structure.");
-                setQuiz(null);
-                setQuestions([]);
                 setLoading(false);
                 return;
             }
-            if (!parsed.quiz) {
-                setError("This quiz has no rows yet — the API returned an empty list.");
-                setQuiz(null);
-                setQuestions([]);
-                setLoading(false);
-                return;
+            setQuiz(quizData);
+
+            // 2. Fetch Questions (Optional fallback)
+            let questionRows = [];
+            try {
+                const questionsResponse = await getQuestionsByQuizId(requestedId);
+                const questionsBody = questionsResponse?.data?.data || questionsResponse?.data || [];
+
+                if (Array.isArray(questionsBody) && questionsBody.length > 0) {
+                    const questionsWithOpts = await Promise.all(
+                        questionsBody.map(async (q) => {
+                            try {
+                                const optRes = await getOptionsByQuestionId(q.id);
+                                const optsData = optRes.data?.data || optRes.data || [];
+                                return { ...q, options: Array.isArray(optsData) ? optsData : [] };
+                            } catch {
+                                return { ...q, options: [] };
+                            }
+                        })
+                    );
+                    questionRows = questionsWithOpts.map(normalizeManageQuestion);
+                } else {
+                    const envelope = quizResponse?.data && typeof quizResponse.data === "object" ? quizResponse.data : {};
+                    questionRows = resolveQuestions(quizData, envelope).map(normalizeManageQuestion);
+                }
+            } catch (err) {
+                console.warn("Questions endpoint failed, falling back to quiz detail response", err);
+                const envelope = quizResponse?.data && typeof quizResponse.data === "object" ? quizResponse.data : {};
+                questionRows = resolveQuestions(quizData, envelope).map(normalizeManageQuestion);
             }
 
-            if (String(parsed.quiz.id) !== String(requestedId)) {
-                setError("Quiz id mismatch between URL and API response.");
-                setQuiz(null);
-                setQuestions([]);
-                setLoading(false);
-                return;
-            }
-
-            setQuiz(parsed.quiz);
-
-            const questionsWithOpts = await Promise.all(
-                parsed.questionRows.map(async (q) => {
-                    try {
-                        const optRes = await getOptionsByQuestionId(q.id);
-                        return { ...q, options: optionsFromResponse(optRes) };
-                    } catch {
-                        return { ...q, options: [] };
-                    }
-                }),
-            );
-            setQuestions(questionsWithOpts.map(normalizeManageQuestion));
+            setQuestions(questionRows);
         } catch (err) {
             if (activeQuizIdRef.current !== requestedId) return;
             setError(err.response?.data?.message || err.message || "An unexpected error occurred");
@@ -173,6 +230,9 @@ export default function useManageQuiz(quizId) {
         }
     }, [quizId]);
 
+
+
+    /** Defer GET so `useEffect` does not synchronously cascade `setLoading` inside the linter rule */
     useEffect(() => {
         if (!quizId) return;
         const timerId = window.setTimeout(() => {
@@ -185,26 +245,28 @@ export default function useManageQuiz(quizId) {
         try {
             setCreatingQuestion(true);
 
+            // 1. Create the question
             const qPayload = {
                 quiz_id: quizId,
                 ...questionData,
             };
             const qResponse = await createQuestion(qPayload);
-            const envelope = qResponse?.data;
-            const newQuestion = envelope?.data ?? envelope;
+            const newQuestion = qResponse.data?.data || qResponse.data;
             const questionId = newQuestion.id;
 
+            // 2. Create the options
             const optionPromises = options.map((opt, idx) => {
                 return createQuestionOption({
                     question_id: questionId,
                     label: opt.label,
                     is_correct: opt.is_correct,
-                    sort_order: idx + 1,
+                    sort_order: idx + 1
                 });
             });
 
             await Promise.all(optionPromises);
 
+            // 3. Update local state (same shape as fetched questions)
             setQuestions((prev) => [
                 ...prev,
                 normalizeManageQuestion({
@@ -217,12 +279,13 @@ export default function useManageQuiz(quizId) {
         } catch (err) {
             return {
                 success: false,
-                error: err.response?.data?.message || "Failed to add question or options",
+                error: err.response?.data?.message || "Failed to add question or options"
             };
         } finally {
             setCreatingQuestion(false);
         }
     };
+
 
     const handleDeleteQuestion = async (questionId) => {
         if (!window.confirm("Are you sure you want to delete this question?")) return;
@@ -242,6 +305,8 @@ export default function useManageQuiz(quizId) {
         }
     };
 
+    /** @param {{ title?: string; category_id?: string | number }} [overrides] — from Manage page inputs when GET omits fields */
+
     const handlePublishQuiz = async (overrides = {}) => {
         const titleRaw = overrides.title ?? quiz?.title ?? "";
         const title = typeof titleRaw === "string" ? titleRaw.trim() : String(titleRaw).trim();
@@ -249,7 +314,7 @@ export default function useManageQuiz(quizId) {
         const categoryRaw =
             catOverride !== undefined && String(catOverride).trim() !== ""
                 ? catOverride
-                : quiz?.category_id;
+                : categoryIdFromQuiz(quiz);
         const category_id = String(categoryRaw ?? "").trim();
 
         if (!title) {
@@ -258,7 +323,7 @@ export default function useManageQuiz(quizId) {
         if (!category_id) {
             return {
                 success: false,
-                error: "category_id is required before publishing.",
+                error: "category_id is required — select a category before publishing.",
             };
         }
 
@@ -307,6 +372,6 @@ export default function useManageQuiz(quizId) {
         handleDeleteQuestion,
         handlePublishQuiz,
 
-        refresh: fetchQuizDetails,
+        refresh: fetchQuizDetails
     };
 }
