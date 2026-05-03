@@ -7,99 +7,105 @@ import QuestionForm from "../components/QuestionForm";
 import QuestionsList from "../components/QuestionsList";
 
 export default function ManageQuiz() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const {
-        quiz,
-        questions,
-        loading,
-        error,
-        creatingQuestion,
-        handleAddQuestion,
-        handlePublishQuiz
-    } = useManageQuiz(id);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const {
+    quiz,
+    questions,
+    loading,
+    error,
+    creatingQuestion,
+    handleAddQuestion,
+    handleDeleteQuestion,
+    handlePublishQuiz,
+  } = useManageQuiz(id);
 
-    if (loading && !quiz) {
-        return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center">
-                <div className="spinner-border qm-text-purple" role="status"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="container py-5 text-center">
-                <div className="alert alert-danger mb-4">{error}</div>
-                <button className="btn btn-qm-primary" onClick={() => navigate("/admin")}>
-                    Back to Dashboard
-                </button>
-            </div>
-        );
-    }
-
-    const onAddQuestion = async (data, options) => {
-        const result = await handleAddQuestion(data, options);
-        if (!result.success) {
-            alert(result.error);
-        }
-    };
-
-
-    const onPublish = async () => {
-        if (questions.length === 0) {
-            alert("Please add at least one question before publishing.");
-            return;
-        }
-        const result = await handlePublishQuiz();
-        if (result.success) {
-            alert("Quiz published successfully!");
-            navigate("/admin");
-        } else {
-            alert(result.error);
-        }
-    };
-
+  if (loading && !quiz) {
     return (
-        <>
-            <QmDashboardNavbar user={user} />
-            <main className="container py-5">
-                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                    <DashboardHeader
-                        title="Manage Quiz"
-                        userName={quiz?.title}
-                        description={quiz?.description}
-                    />
-                    <div className="d-flex gap-2">
-                        <button
-                            className="btn btn-outline-secondary px-4 rounded-3"
-                            onClick={() => navigate("/admin")}
-                        >
-                            Back
-                        </button>
-                        <button
-                            className="btn btn-qm-primary px-4 rounded-3 d-flex align-items-center gap-2"
-                            onClick={onPublish}
-                            disabled={loading || questions.length === 0}
-                        >
-                            {loading ? (
-                                <span className="spinner-border spinner-border-sm"></span>
-                            ) : null}
-                            {quiz?.is_published ? "Published" : "Publish Quiz"}
-                        </button>
-                    </div>
-                </div>
-
-                <div className="row g-4">
-                    <div className="col-lg-5">
-                        <QuestionForm onSubmit={onAddQuestion} loading={creatingQuestion} />
-                    </div>
-                    <div className="col-lg-7">
-                        <QuestionsList questions={questions} />
-                    </div>
-                </div>
-            </main>
-        </>
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border qm-text-purple" role="status"></div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="container py-5 text-center">
+        <div className="alert alert-danger mb-4">{error}</div>
+        <button
+          className="btn btn-qm-primary"
+          onClick={() => navigate("/admin")}
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    );
+  }
+
+  const onAddQuestion = async (data, options) => {
+    const result = await handleAddQuestion(data, options);
+    if (!result.success) {
+      alert(result.error);
+    }
+  };
+
+  const onPublish = async () => {
+    if (questions.length === 0) {
+      alert("Please add at least one question before publishing.");
+      return;
+    }
+    const result = await handlePublishQuiz();
+    if (result.success) {
+      alert("Quiz published successfully!");
+      navigate("/admin");
+    } else {
+      alert(result.error);
+    }
+  };
+
+  return (
+    <>
+      <QmDashboardNavbar user={user} />
+      <main className="container py-5">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+          <DashboardHeader
+            title="Manage Quiz"
+            userName={quiz?.title}
+            description={quiz?.description}
+          />
+          <div className="d-flex gap-2">
+            <button
+              className="btn btn-outline-secondary px-4 rounded-3"
+              onClick={() => navigate("/admin")}
+            >
+              Back
+            </button>
+            <button
+              className="btn btn-qm-primary px-4 rounded-3 d-flex align-items-center gap-2"
+              onClick={onPublish}
+              disabled={loading || questions.length === 0}
+            >
+              {loading ? (
+                <span className="spinner-border spinner-border-sm"></span>
+              ) : null}
+              {quiz?.is_published ? "Published" : "Publish Quiz"}
+            </button>
+          </div>
+        </div>
+
+        <div className="row g-4">
+          <div className="col-lg-5">
+            <QuestionForm onSubmit={onAddQuestion} loading={creatingQuestion} />
+          </div>
+          <div className="col-lg-7">
+            <QuestionsList
+              questions={questions}
+              onDelete={handleDeleteQuestion}
+            />
+          </div>
+        </div>
+      </main>
+    </>
+  );
 }

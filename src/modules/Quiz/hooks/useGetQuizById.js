@@ -6,7 +6,7 @@ function normalizeQuiz(quiz) {
   return {
     id: quiz.id,
     title: quiz.title || "Untitled Quiz",
-    category: quiz.category || "General",
+    category: (typeof quiz.category === 'object' ? quiz.category?.name : quiz.category) || "General",
     description: quiz.description || "No description available.",
     duration: quiz.time_limit_minutes || 0,
     difficulty: (quiz.difficulty || "medium").toLowerCase(),

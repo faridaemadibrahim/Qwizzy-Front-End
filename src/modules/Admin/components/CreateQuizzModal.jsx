@@ -1,13 +1,40 @@
-export default function CreateQuizzModal({ 
-    show, 
-    onHide, 
-    formData, 
-    onChange, 
-    onSubmit, 
-    loading, 
-    error, 
-    success 
+import { useState, useEffect } from "react";
+import { getCategories } from "../../Quiz/services/quizService";
+import { getCategoryOptionLabel } from "../../../utils/categoryDisplay";
+
+export default function CreateQuizzModal({
+    show,
+    onHide,
+    formData,
+    onChange,
+    onSubmit,
+    loading,
+    error,
+    success
 }) {
+    const [categories, setCategories] = useState([]);
+    const [fetchingCategories, setFetchingCategories] = useState(false);
+
+    useEffect(() => {
+        if (show) {
+            const fetchCategories = async () => {
+                setFetchingCategories(true);
+                try {
+                    const response = await getCategories();
+                    const body = response.data;
+                    const data = Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : [];
+                    setCategories(data);
+                } catch (err) {
+                    console.error("Failed to fetch categories:", err);
+                    setCategories([]);
+                } finally {
+                    setFetchingCategories(false);
+                }
+            };
+            fetchCategories();
+        }
+    }, [show]);
+
     if (!show) return null;
 
     return (
@@ -54,15 +81,22 @@ export default function CreateQuizzModal({
 
                             <div className="mb-3">
                                 <label className="form-label small fw-bold">Category</label>
-                                <input
-                                    type="text"
-                                    name="category"
-                                    className="form-control"
-                                    placeholder="e.g. Programming, History, etc."
-                                    value={formData.category}
+                                <select
+                                    name="category_id"
+                                    className="form-select qm-select-readable"
+                                    value={formData.category_id}
                                     onChange={onChange}
                                     required
-                                />
+                                    disabled={fetchingCategories}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {getCategoryOptionLabel(cat)}
+                                        </option>
+                                    ))}
+                                </select>
+                                {fetchingCategories && <div className="form-text small">Loading categories...</div>}
                             </div>
 
                             <div className="mb-3">
@@ -94,7 +128,7 @@ export default function CreateQuizzModal({
                                     <label className="form-label small fw-bold">Difficulty</label>
                                     <select
                                         name="difficulty"
-                                        className="form-select"
+                                        className="form-select qm-select-readable"
                                         value={formData.difficulty}
                                         onChange={onChange}
                                     >

@@ -11,9 +11,16 @@ export const createQuestion = (data) => {
 export const updateQuiz = (id, data) => {
     return api.put(`quizzes/${id}`, data);
 };
-
-
 export const createQuestionOption = (data) => {
     return api.post("question-options", data);
 };
-
+
+export const getOptionsByQuestionId = (id) => {
+    return api.get(`question-options/question/${id}`);
+};
+
+export const deleteQuestion = (id) => {
+    return api.delete(`questions/${id}`);
+};
+
+

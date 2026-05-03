@@ -15,7 +15,11 @@ export const getQuizById = (id) => {
     return api.get(`/quizzes/${id}`);
 };
 
-export const getQuestionsByQuizId = (id) => {
-    // Nested route: get all questions belonging to a specific quiz
-    return api.get(`/quizzes/${id}/questions`);
+export const getCategories = () => {
+    return api.get("/categories");
 };
+
+export const getQuestionsByQuizId = (id) => {
+    return api.get(`/questions/quiz/${id}`);
+};
+

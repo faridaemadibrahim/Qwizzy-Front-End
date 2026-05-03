@@ -4,7 +4,7 @@ import { createQuiz } from "../services/admin.api";
 const INITIAL_FORM = {
     title: "",
     description: "",
-    category: "",
+    category_id: "",
     is_published: false,
     time_limit_minutes: "5",
     difficulty: "medium",
@@ -42,7 +42,7 @@ export default function useCreateQuiz(show, onHide, onSuccess) {
             const title = typeof formData.title === "string" ? formData.title.trim() : "";
             const description =
                 typeof formData.description === "string" ? formData.description.trim() : "";
-            const category = typeof formData.category === "string" ? formData.category.trim() : "";
+            const category_id = formData.category_id;
 
             if (!title) {
                 setError("Quiz title is required.");
@@ -54,7 +54,7 @@ export default function useCreateQuiz(show, onHide, onSuccess) {
                 setLoading(false);
                 return false;
             }
-            if (!category) {
+            if (!category_id) {
                 setError("Category is required.");
                 setLoading(false);
                 return false;
@@ -64,7 +64,7 @@ export default function useCreateQuiz(show, onHide, onSuccess) {
                 ...formData,
                 title,
                 description,
-                category,
+                category_id: String(category_id).trim(),
                 time_limit_minutes: Number.parseInt(String(formData.time_limit_minutes), 10) || 5,
             };
 

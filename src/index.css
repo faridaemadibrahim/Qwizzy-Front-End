@@ -90,3 +90,10 @@ body {
   --bs-btn-hover-color: #fff;
   --bs-btn-active-color: #fff;
 }
+
+/* Native selects: avoid OS dark color-scheme making option text invisible on light rows */
+select.qm-select-readable,
+select.qm-select-readable option {
+  color: #111827;
+  background-color: #fff;
+}

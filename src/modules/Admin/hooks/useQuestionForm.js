@@ -18,7 +18,24 @@ export default function useQuestionForm(onSubmit) {
             ...prev,
             [name]: name === "points" || name === "sort_order" ? Number(value) : value,
         }));
+
+        // Automatically set True/False options if type is changed
+        if (name === "question_type") {
+            if (value === "TRUE_FALSE") {
+                setOptions([
+                    { label: "True", is_correct: false },
+                    { label: "False", is_correct: false },
+                ]);
+            } else if (value === "MCQ") {
+                setOptions([
+                    { label: "", is_correct: false },
+                    { label: "", is_correct: false },
+                ]);
+            }
+        }
     };
+
+
 
     const handleOptionChange = (index, field, value) => {
         const newOptions = [...options];

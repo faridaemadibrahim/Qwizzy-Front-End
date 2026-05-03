@@ -1,4 +1,6 @@
-export default function QuestionsList({ questions }) {
+import { Trash as TrashIcon } from "@phosphor-icons/react";
+
+export default function QuestionsList({ questions, onDelete }) {
     if (questions.length === 0) {
         return (
             <div className="text-center py-5 bg-light rounded-4 border-dashed mb-4">
@@ -21,7 +23,17 @@ export default function QuestionsList({ questions }) {
                                 {idx + 1}
                             </div>
                             <div className="w-100">
-                                <p className="mb-2 fw-medium">{q.body}</p>
+                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <p className="mb-0 fw-medium">{q.body}</p>
+                                    <button 
+                                        className="btn btn-link text-danger p-0 border-0" 
+                                        onClick={() => onDelete(q.id)}
+                                        title="Delete Question"
+                                    >
+                                        <TrashIcon size={32} />
+                                    </button>
+                                </div>
+
                                 
                                 {/* Options List */}
                                 <div className="row g-2 mb-3">
@@ -51,3 +63,4 @@ export default function QuestionsList({ questions }) {
         </div>
     );
 }
+
