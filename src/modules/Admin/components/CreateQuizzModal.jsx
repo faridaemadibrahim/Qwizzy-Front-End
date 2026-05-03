@@ -53,6 +53,19 @@ export default function CreateQuizzModal({
                             </div>
 
                             <div className="mb-3">
+                                <label className="form-label small fw-bold">Category</label>
+                                <input
+                                    type="text"
+                                    name="category"
+                                    className="form-control"
+                                    placeholder="e.g. Programming, History, etc."
+                                    value={formData.category}
+                                    onChange={onChange}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
                                 <label className="form-label small fw-bold">Description</label>
                                 <textarea
                                     name="description"

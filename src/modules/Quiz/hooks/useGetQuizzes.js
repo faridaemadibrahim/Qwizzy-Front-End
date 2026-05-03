@@ -1,43 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
-import { getAllQuizzes, getQuestionsByQuizId } from "../services/quizService.js";
+import { getAllQuizzesWithQuestionCount } from "../services/quizService.js";
 
-function normalizeQuiz(quiz, idx) {
-  const normalizedTitle =
-    (typeof quiz.title === "string" && quiz.title.trim()) ||
-    (typeof quiz.name === "string" && quiz.name.trim()) ||
-    "Untitled Quiz";
-
-  const normalizedDescription =
-    (typeof quiz.description === "string" && quiz.description.trim()) ||
-    "No description available.";
-
+function normalizeQuiz(quiz) {
   return {
-    id: quiz.id ?? quiz._id ?? idx + 1,
-    title: normalizedTitle,
-    category: quiz.category ?? "General",
-    description: normalizedDescription,
-    questions:
-      quiz.questionsCount ??
-      quiz.totalQuestions ??
-      quiz.question_count ??
-      (Array.isArray(quiz.questions) ? quiz.questions.length : quiz.questions) ??
-      0,
-    duration:
-      quiz.duration ??
-      quiz.durationMinutes ??
-      quiz.timeLimit ??
-      quiz.time_limit_minutes ??
-      0,
-    difficulty: (quiz.difficulty ?? "medium").toLowerCase(),
+    id: quiz.id,
+    title: quiz.title || "Untitled Quiz",
+    category: quiz.category || "General",
+    description: quiz.description || "No description available.",
+    duration: quiz.time_limit_minutes || 0,
+    difficulty: (quiz.difficulty || "medium").toLowerCase(),
+    questions: quiz.questions_count || 0,
   };
 }
 
 function getQuizArray(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.quizzes)) return payload.quizzes;
-  if (Array.isArray(payload?.results)) return payload.results;
-  return [];
+  return payload?.data || payload || [];
 }
 
 export default function useQuizzes() {
@@ -49,9 +26,9 @@ export default function useQuizzes() {
     setLoading(true);
     setError("");
     try {
-      const { data } = await getAllQuizzes();
+      const { data } = await getAllQuizzesWithQuestionCount();
       const rawQuizzes = getQuizArray(data);
-      const normalized = rawQuizzes.map((q, i) => normalizeQuiz(q, i));
+      const normalized = rawQuizzes.map((q) => normalizeQuiz(q));
 
       setQuizzes(normalized);
     } catch (err) {

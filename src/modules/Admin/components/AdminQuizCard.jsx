@@ -39,8 +39,8 @@ export default function AdminQuizCard({ quiz }) {
                 </div>
 
                 {/* CTA */}
-                <button 
-                    className="btn-start-quiz" 
+                <button
+                    className="btn-start-quiz"
                     style={{ background: "#f4f0fd", color: "#7c3aed", border: "1px solid #7c3aed" }}
                     onClick={() => navigate(`/admin/quiz/${quiz.id}`)}
                 >

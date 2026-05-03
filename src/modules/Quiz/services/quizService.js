@@ -3,6 +3,11 @@ import api from "../../../API/axiosInstance.js";
 export const getAllQuizzes = () => {
     return api.get("/quizzes");
 };
+
+export const getAllQuizzesWithQuestionCount = () => {
+    return api.get("/quizzes/question_count/");
+};
+
 export const getUserStates = () => {
     return api.get(`/users/stats`);
 };

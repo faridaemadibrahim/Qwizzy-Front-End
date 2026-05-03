@@ -2,35 +2,16 @@ import { useEffect, useState } from "react";
 import { getQuizById } from "../services/quizService.js";
 
 function normalizeQuiz(quiz) {
-  if (!quiz || typeof quiz !== "object") return null;
-  const normalizedTitle =
-    (typeof quiz.title === "string" && quiz.title.trim()) ||
-    (typeof quiz.name === "string" && quiz.name.trim()) ||
-    "Untitled Quiz";
-
-  const normalizedDescription =
-    (typeof quiz.description === "string" && quiz.description.trim()) ||
-    "No description available.";
-
+  if (!quiz) return null;
   return {
-    id: quiz.id ?? quiz._id,
-    title: normalizedTitle,
-    category: quiz.category ?? "General",
-    description: normalizedDescription,
-    questions:
-      quiz.questionsCount ??
-      quiz.totalQuestions ??
-      quiz.questions ??
-      quiz.question_count ??
-      0,
-    duration:
-      quiz.duration ??
-      quiz.durationMinutes ??
-      quiz.timeLimit ??
-      quiz.time_limit_minutes ??
-      0,
-    difficulty: (quiz.difficulty ?? "medium").toLowerCase(),
-    questionsList: quiz.questionsList ?? quiz.questions_list ?? [],
+    id: quiz.id,
+    title: quiz.title || "Untitled Quiz",
+    category: quiz.category || "General",
+    description: quiz.description || "No description available.",
+    duration: quiz.time_limit_minutes || 0,
+    difficulty: (quiz.difficulty || "medium").toLowerCase(),
+    questions: quiz.questions_count || 0,
+    questionsList: quiz.questions_list || [],
   };
 }
 
@@ -50,19 +31,10 @@ export default function useGetQuizById(id) {
         const { data } = await getQuizById(id);
         if (!active) return;
 
-        // Robustly find the quiz object in the response
-        let quizData = data;
-        if (data?.quiz) quizData = data.quiz;
-        else if (data?.data?.quiz) quizData = data.data.quiz;
-        else if (data?.data) quizData = data.data;
+        const quizData = data?.data || data;
 
         if (quizData) {
-          const normalized = normalizeQuiz(quizData);
-          if (normalized) {
-            setQuiz(normalized);
-          } else {
-            setError("Failed to parse quiz details.");
-          }
+          setQuiz(normalizeQuiz(quizData));
         } else {
           setError("No quiz details found.");
         }
