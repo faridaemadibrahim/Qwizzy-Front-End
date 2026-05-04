@@ -71,8 +71,8 @@ export default function ManageQuiz() {
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
           <DashboardHeader
             title="Manage Quiz"
-            userName={quiz?.title}
-            description={quiz?.description}
+            userName={quiz?.title || quiz?.name || quiz?.quiz_title || quiz?.quizTitle || "Quiz"}
+            description={quiz?.description || quiz?.quiz_description}
           />
           <div className="d-flex gap-2">
             <button
@@ -94,11 +94,9 @@ export default function ManageQuiz() {
           </div>
         </div>
 
-        <div className="row g-4">
-          <div className="col-lg-5">
+        <div className=" d-flex justify-content-center ">
+          <div className="d-flex w-50  flex-column gap-4 box-shadow">
             <QuestionForm onSubmit={onAddQuestion} loading={creatingQuestion} />
-          </div>
-          <div className="col-lg-7">
             <QuestionsList
               questions={questions}
               onDelete={handleDeleteQuestion}

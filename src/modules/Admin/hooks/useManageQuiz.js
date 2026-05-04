@@ -21,7 +21,8 @@ function formatUpdateQuizError(err) {
 
 /** Unwrap common API shapes around a single quiz object. */
 function unwrapQuizResponse(response) {
-    const body = response?.data;
+    // If response is already the data object (no .data property), use it directly
+    const body = response?.data !== undefined ? response.data : response;
     if (!body || typeof body !== "object") return null;
 
     const candidates = [
@@ -29,6 +30,9 @@ function unwrapQuizResponse(response) {
         body.quiz,
         body.result,
         body.payload?.quiz,
+        // If it's an array of joined rows, pick the first one for quiz metadata
+        Array.isArray(body.data) && body.data.length > 0 ? body.data[0] : null,
+        Array.isArray(body) && body.length > 0 ? body[0] : null,
         typeof body.payload === "object" && body.payload?.id != null ? body.payload : null,
         typeof body.data === "object" && body.data !== null && !Array.isArray(body.data)
             ? body.data.quiz ?? body.data
@@ -42,7 +46,8 @@ function unwrapQuizResponse(response) {
             "title" in raw ||
             "questions" in raw ||
             raw.name != null ||
-            raw.quiz_title != null;
+            raw.quiz_title != null ||
+            raw.quizTitle != null;
         if (looksLikeQuiz) return raw;
     }
 
@@ -56,16 +61,18 @@ function normalizeFetchedQuiz(raw) {
     if (!raw || typeof raw !== "object") return raw;
     const pickTitle = (...cands) => {
         for (const c of cands) {
-            if (typeof c === "string" && c.trim()) return c.trim();
+            if (c && typeof c === "string" && c.trim()) return c.trim();
+            if (c && typeof c === "object" && c.title) return String(c.title).trim();
         }
-        return "";
+        return null;
     };
     const titled = pickTitle(
         raw.title,
         raw.name,
         raw.quiz_title,
         raw.quizTitle,
-        raw.quiz_name
+        raw.quiz_name,
+        raw.quiz_text
     );
     let category_id = raw.category_id ?? raw.categoryId;
     if (category_id == null && raw.category != null) {
@@ -74,7 +81,7 @@ function normalizeFetchedQuiz(raw) {
     }
     return {
         ...raw,
-        title: titled,
+        title: titled || raw.title || raw.name || raw.quiz_title || "",
         ...(category_id != null ? { category_id } : {}),
     };
 }

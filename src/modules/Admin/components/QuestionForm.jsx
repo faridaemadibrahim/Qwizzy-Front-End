@@ -84,8 +84,8 @@ export default function QuestionForm({ onSubmit, loading }) {
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <label className="form-label small fw-bold mb-0">Answer Options</label>
                             {formData.question_type === "MCQ" && (
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     className="btn btn-sm qm-text-purple p-0 fw-bold"
                                     onClick={addOption}
                                     disabled={options.length >= 6}
@@ -94,7 +94,7 @@ export default function QuestionForm({ onSubmit, loading }) {
                                 </button>
                             )}
                         </div>
-                        
+
                         <div className="d-flex flex-column gap-2">
                             {options.map((opt, idx) => (
                                 <div key={idx} className="input-group input-group-sm">
@@ -118,8 +118,8 @@ export default function QuestionForm({ onSubmit, loading }) {
                                         required
                                     />
                                     {formData.question_type === "MCQ" && options.length > 2 && (
-                                        <button 
-                                            className="btn btn-outline-danger" 
+                                        <button
+                                            className="btn btn-outline-danger"
                                             type="button"
                                             onClick={() => removeOption(idx)}
                                         >

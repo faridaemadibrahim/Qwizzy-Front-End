@@ -29,12 +29,16 @@ body {
   flex-direction: column;
 }
 
-.qm-app > main {
+.qm-app>main {
   flex: 1;
 }
 
 .qm-text-purple {
   color: var(--qm-purple);
+}
+
+.qm-text-muted {
+  color: var(--qm-text-muted);
 }
 
 .qm-border-light {
