@@ -13,28 +13,20 @@ import CreateQuizzModal from "../components/CreateQuizzModal";
 import "../../Quiz/styles/QuizzesList.css";
 import useQuizzes from "../../Quiz/hooks/useGetQuizzes";
 import useCreateQuiz from "../hooks/useCreateQuiz";
-
-// Dummy Data
-const dummyUsers = [
-  { id: 1, name: "Alice Smith", email: "alice@example.com", role: "Learner", quizzesTaken: 12 },
-  { id: 2, name: "Bob Johnson", email: "bob@example.com", role: "Learner", quizzesTaken: 5 },
-  { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "Learner", quizzesTaken: 8 },
-  { id: 4, name: "Diana Prince", email: "diana@example.com", role: "Learner", quizzesTaken: 15 },
-];
-
-// Removed static stats definition to move it inside the component for live data tracking.
+import useGetAllUsers from "../../../shared/hooks/useGetAllUsers";
 
 
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { quizzes, loading: quizzesLoading, refetch: refetchQuizzes } = useQuizzes();
+  const { users, loading: usersLoading, error: usersError } = useGetAllUsers();
+
 
   // Live stats based on actual data
   const stats = [
-    { label: "Total Users", value: dummyUsers.length, emoji: "👥" },
+    { label: "Total Users", value: users.length, emoji: "👥" },
     { label: "Total Quizzes", value: quizzes.length, emoji: "🗂️" },
-    { label: "Active Sessions", value: "12", emoji: "🔥" },
   ];
 
   const { 
@@ -120,11 +112,25 @@ export default function AdminDashboard() {
           </div>
 
           <div className="row g-4">
-            {dummyUsers.map((u) => (
-              <div className="col-12 col-md-6 col-lg-3" key={u.id}>
-                <UsersCard user={u} />
+            {usersLoading ? (
+              <div className="text-center py-5 w-100">
+                <div className="spinner-border qm-text-purple" role="status"></div>
               </div>
-            ))}
+            ) : usersError ? (
+              <div className="col-12 text-center py-5">
+                <p className="text-danger">{usersError}</p>
+              </div>
+            ) : users.length > 0 ? (
+              users.map((u) => (
+                <div className="col-12 col-md-6 col-lg-3" key={u.id}>
+                  <UsersCard user={u} />
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center py-5">
+                <p className="qm-text-muted">No users registered yet.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>

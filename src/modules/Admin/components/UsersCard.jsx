@@ -31,8 +31,8 @@ export default function UsersCard({ user }) {
           className="mb-0"
           style={{ fontSize: "0.85rem", fontWeight: "600", color: "#333" }}
         >
-          🎯 Quizzes Taken:{" "}
-          <span style={{ color: "#7c3aed" }}>{user.quizzesTaken}</span>
+          🎯 {user.role?.toLowerCase() === "instructor" ? "Quizzes Created" : "Quizzes Taken"}:{" "}
+          <span style={{ color: "#7c3aed" }}>{user.quizzesCount}</span>
         </p>
       </div>
     </div>
