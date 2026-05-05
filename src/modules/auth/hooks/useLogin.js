@@ -26,6 +26,7 @@ export default function useLogin() {
         email: auth.email || email,
         name: auth.name,
         role: auth.role,
+        id: auth.id,
       });
 
       if (auth.role === "admin" || auth.role === "instructor") {

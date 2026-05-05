@@ -7,7 +7,7 @@ export const registerCopy = {
   title: 'Create Account',
   subtitle: 'Start your learning journey today',
 }
-export const ForgetPasswordCCopy = {
+export const ForgetPasswordCopy = {
   title: 'Forgot Password',
   subtitle: 'Enter your email to reset your password',
 }
@@ -16,4 +16,4 @@ export const ForgetPasswordCCopy = {
 // Legacy export — keeps LoginCard working without changes
 export const authCopy = loginCopy
 export const authCopyRegister = registerCopy
-export const authCopyForgetPassword = ForgetPasswordCCopy
+export const authCopyForgetPassword = ForgetPasswordCopy

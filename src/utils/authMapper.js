@@ -3,7 +3,7 @@ import { decodeJwtPayload } from "./token.js";
 /**
  * Normalize login response into auth model for app state.
  * @param {unknown} raw
- * @returns {{ token: string; email: string; name: string } | null}
+ * @returns {{ token: string; email: string; name: string; role?: string; id?: string } | null}
  */
 export function mapLoginResponse(raw) {
   if (!raw || typeof raw !== "object") return null;
@@ -83,5 +83,24 @@ export function mapLoginResponse(raw) {
               : undefined
   );
 
-  return { token, email: email ?? "", name: name ?? "", role: role ?? "" };
+  const idRaw =
+    (userObj && (userObj.id ?? userObj._id ?? userObj.userId)) ??
+    (nestedUserObj &&
+      (nestedUserObj.id ?? nestedUserObj._id ?? nestedUserObj.userId)) ??
+    (nested && (nested.id ?? nested.userId ?? nested.user_id)) ??
+    (typeof d.id !== "undefined" ? d.id : undefined) ??
+    (typeof d.userId !== "undefined" ? d.userId : undefined);
+
+  const id =
+    idRaw !== null && idRaw !== undefined && idRaw !== ""
+      ? String(idRaw)
+      : undefined;
+
+  return {
+    token,
+    email: email ?? "",
+    name: name ?? "",
+    role: role ?? "",
+    id,
+  };
 }

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.jpg";
 import { useAuth } from "../../context/useAuth.jsx";
+import { SignOut } from "@phosphor-icons/react";
 export default function QmDashboardNavbar({ user }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -35,11 +36,13 @@ export default function QmDashboardNavbar({ user }) {
             </div>
             <button
               title="Sign out"
-              className="btn btn-link qm-text-muted p-0"
+              className="btn btn-link text-danger p-0"
               style={{ fontSize: "1.2rem", lineHeight: 1 }}
               onClick={handleLogout}
             >
-              ↪
+              <SignOut size={32} />
+
+
             </button>
           </div>
         </div>

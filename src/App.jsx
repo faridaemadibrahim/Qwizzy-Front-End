@@ -8,7 +8,9 @@ import RootLayout from "./layouts/RootLayout.jsx";
 import Register from "./modules/auth/pages/Register.jsx";
 import VerifyEmail from "./modules/auth/pages/VerifyEmail.jsx";
 import QuizzesList from "./modules/Quiz/Pages/QuizzesList.jsx";
-import AdminDashboard from "./modules/Admin/Pages/AdminDashboard.jsx";
+import QuizDetails from "./modules/Quiz/Pages/QuizDetails.jsx";
+import AdminDashboard from "./modules/Admin/pages/AdminDashboard.jsx";
+import ManageQuiz from "./modules/Admin/pages/ManageQuiz.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
 export default function App() {
@@ -24,7 +26,9 @@ export default function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
         </Route>
         <Route path="/quizzes" element={<QuizzesList />} />
+        <Route path="/quiz/:id" element={<QuizDetails />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/quiz/:id" element={<ManageQuiz />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>

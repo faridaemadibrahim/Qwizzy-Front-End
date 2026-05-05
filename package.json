@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "axios": "^1.15.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "jwt-decode": "^4.0.0",
+    "phosphor": "^0.7.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.14.1"

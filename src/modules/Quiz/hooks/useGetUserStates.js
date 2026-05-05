@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getUserStats } from "../services/quizService";
+import { getUserStates } from "../services/quizService.js";
 
 export default function useGetUserStates() {
     const [stats, setStats] = useState([]);
@@ -10,7 +10,7 @@ export default function useGetUserStates() {
         const fetchStats = async () => {
             try {
                 setLoading(true);
-                const response = await getUserStats();
+                const response = await getUserStates();
                 const data = response.data?.data || response.data;
 
                 setStats([

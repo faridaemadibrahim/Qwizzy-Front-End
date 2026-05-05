@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import DifficultyBadge from "../../../shared/components/DifficultyBadge";
 
 // Admin specific Quiz Card
 export default function AdminQuizCard({ quiz }) {
+    const navigate = useNavigate();
+
     return (
         <div className="card border-0 h-100 quiz-card">
             <div className="card-body d-flex flex-column p-4">
@@ -36,7 +39,11 @@ export default function AdminQuizCard({ quiz }) {
                 </div>
 
                 {/* CTA */}
-                <button className="btn-start-quiz" style={{ background: "#f4f0fd", color: "#7c3aed", border: "1px solid #7c3aed" }}>
+                <button
+                    className="btn-start-quiz"
+                    style={{ background: "#f4f0fd", color: "#7c3aed", border: "1px solid #7c3aed" }}
+                    onClick={() => navigate(`/admin/quiz/${quiz.id}`)}
+                >
                     Manage Quiz
                 </button>
             </div>
