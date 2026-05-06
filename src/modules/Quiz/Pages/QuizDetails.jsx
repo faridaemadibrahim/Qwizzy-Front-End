@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useGetQuizById from "../hooks/useGetQuizById";
+import useSubmitQuiz from "../hooks/useSubmitQuiz";
 import { useAuth } from "../../../context/useAuth.jsx";
 import "../styles/QuizPlay.css";
 
@@ -9,6 +10,7 @@ export default function QuizDetails() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { quiz, loading, error } = useGetQuizById(id);
+  const { handleSubmit: submitQuiz, loading: submitting } = useSubmitQuiz();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -120,6 +122,22 @@ export default function QuizDetails() {
     setSelectedAnswers({ ...selectedAnswers, [currentIndex]: option });
   };
 
+  const handleSubmitQuiz = async () => {
+    const answers = questions.map((q, idx) => ({
+      question_id: q.id,
+      selected_option_id: selectedAnswers[idx]?.id || null,
+    }));
+
+    const result = await submitQuiz(quiz.id, answers);
+    if (result.success) {
+      navigate(`/quiz/${id}/result`, {
+        state: { resultData: result.data, quizTitle: quiz.title },
+      });
+    } else {
+      alert(result.error || "Failed to submit quiz.");
+    }
+  };
+
   return (
     <div className="quiz-play-container">
       <div className="container">
@@ -154,14 +172,14 @@ export default function QuizDetails() {
           <div className="options-container mb-5">
             {currentQuestion.options.map((option, idx) => (
               <div
-                key={idx}
+                key={option.id || idx}
                 className={`option-item ${
-                  selectedAnswers[currentIndex] === option ? "selected" : ""
+                  selectedAnswers[currentIndex]?.id === option.id ? "selected" : ""
                 }`}
                 onClick={() => handleOptionSelect(option)}
               >
                 <div className="option-radio"></div>
-                <span className="option-label">{option}</span>
+                <span className="option-label">{typeof option === "object" ? option.label : option}</span>
               </div>
             ))}
           </div>
@@ -178,32 +196,52 @@ export default function QuizDetails() {
               <span>⟨</span> Previous
             </button>
 
-            <div className="question-dots d-none d-md-flex">
-              {questions.map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`dot ${currentIndex === idx ? "active" : ""} ${
-                    selectedAnswers[idx] ? "completed" : ""
-                  }`}
-                  onClick={() => setCurrentIndex(idx)}
-                >
-                  {idx + 1}
-                </div>
-              ))}
+            <div className="question-dots d-none d-md-flex align-items-center">
+              {currentIndex > 2 && questions.length > 5 && (
+                <span className="text-muted mx-1">...</span>
+              )}
+              {questions
+                .map((_, idx) => idx)
+                .filter((idx) => {
+                  if (questions.length <= 5) return true;
+                  let start = Math.max(0, currentIndex - 2);
+                  let end = Math.min(questions.length - 1, start + 4);
+                  if (end === questions.length - 1) {
+                    start = Math.max(0, end - 4);
+                  }
+                  return idx >= start && idx <= end;
+                })
+                .map((idx) => (
+                  <div
+                    key={idx}
+                    className={`dot ${currentIndex === idx ? "active" : ""} ${
+                      selectedAnswers[idx] ? "completed" : ""
+                    }`}
+                    onClick={() => setCurrentIndex(idx)}
+                  >
+                    {idx + 1}
+                  </div>
+                ))}
+              {currentIndex < questions.length - 3 && questions.length > 5 && (
+                <span className="text-muted mx-1">...</span>
+              )}
             </div>
 
             <button
               className="btn nav-btn btn-next"
+              disabled={submitting}
               onClick={() => {
                 if (currentIndex < questions.length - 1) {
                   setCurrentIndex((prev) => prev + 1);
                 } else {
-                  alert("Quiz Submitted Successfully!");
-                  navigate("/quizzes");
+                  handleSubmitQuiz();
                 }
               }}
             >
-              {currentIndex === questions.length - 1 ? "Finish" : "Next"}{" "}
+              {submitting ? (
+                <span className="spinner-border spinner-border-sm me-2"></span>
+              ) : null}
+              {currentIndex === questions.length - 1 ? "Submit" : "Next"}{" "}
               <span className="ms-2">⟩</span>
             </button>
           </div>
