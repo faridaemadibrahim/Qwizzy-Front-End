@@ -295,8 +295,6 @@ export default function useManageQuiz(quizId) {
 
 
     const handleDeleteQuestion = async (questionId) => {
-        if (!window.confirm("Are you sure you want to delete this question?")) return;
-
         try {
             setLoading(true);
             await deleteQuestion(questionId);
