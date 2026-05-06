@@ -212,15 +212,17 @@ export default function ResetPasswordCard() {
                         </svg>
                       )}
                     </button>
-                    {passwordsMismatch && (
-                      <div className="invalid-feedback">
-                        Passwords do not match
-                      </div>
-                    )}
-                    {passwordsMatch && (
-                      <div className="valid-feedback">Passwords match</div>
-                    )}
                   </div>
+                  {passwordsMismatch && (
+                    <div className="invalid-feedback d-block mt-1">
+                      Passwords do not match
+                    </div>
+                  )}
+                  {passwordsMatch && (
+                    <div className="valid-feedback d-block mt-1">
+                      Passwords match
+                    </div>
+                  )}
                 </div>
 
                 <button

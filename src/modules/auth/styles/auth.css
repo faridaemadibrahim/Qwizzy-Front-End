@@ -30,11 +30,33 @@
 
 .auth-card .form-control {
   border-color: #e5e7eb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-card .form-control.is-invalid {
+  border-color: #ef4444 !important;
+}
+
+.auth-card .form-control.is-valid {
+  border-color: #22c55e !important;
+}
+
+/* Move validation icons to the left for password fields to avoid overlap with eye icon */
+.auth-card .position-relative .form-control.is-invalid {
+  background-position: right 2.5rem center !important;
+}
+
+.auth-card .position-relative .form-control.is-valid {
+  background-position: right 2.5rem center !important;
 }
 
 .auth-card .form-control:focus {
   border-color: rgba(124, 58, 237, 0.45);
   box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.15);
+}
+
+.auth-card .form-control.is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.15);
 }
 
 .btn-qm-primary {
@@ -147,11 +169,33 @@
 
 .auth-card .form-control {
   border-color: var(--qm-border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-card .form-control.is-invalid {
+  border-color: #ef4444 !important;
+}
+
+.auth-card .form-control.is-valid {
+  border-color: #22c55e !important;
+}
+
+/* Move validation icons to the left for password fields to avoid overlap with eye icon */
+.auth-card .position-relative .form-control.is-invalid {
+  background-position: right 2.5rem center !important;
+}
+
+.auth-card .position-relative .form-control.is-valid {
+  background-position: right 2.5rem center !important;
 }
 
 .auth-card .form-control:focus {
   border-color: rgba(124, 58, 237, 0.45);
   box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.15);
+}
+
+.auth-card .form-control.is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.15);
 }
 
 /* Hide browser default password eye icon */

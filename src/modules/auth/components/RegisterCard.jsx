@@ -79,13 +79,16 @@ export default function RegisterCard() {
                   </label>
                   <input
                     id={emailId}
-                    className="form-control form-control-lg"
+                    className={`form-control form-control-lg ${errors.email ? "is-invalid" : ""}`}
                     type="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                  {errors.email && (
+                    <div className="invalid-feedback">{errors.email}</div>
+                  )}
                 </div>
 
                 {/* Password */}
@@ -144,7 +147,9 @@ export default function RegisterCard() {
                     </button>
                   </div>
                   {errors.password && (
-                    <div className="invalid-feedback">{errors.password}</div>
+                    <div className="invalid-feedback d-block mt-1">
+                      {errors.password}
+                    </div>
                   )}
                 </div>
 
@@ -204,7 +209,7 @@ export default function RegisterCard() {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <div className="invalid-feedback">
+                    <div className="invalid-feedback d-block mt-1">
                       {errors.confirmPassword}
                     </div>
                   )}
