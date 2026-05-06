@@ -10,7 +10,17 @@ export default function useRegister() {
     async function handleRegister({ name, email, password, confirmPassword }) {
         const newErrors = {};
 
-        if (!name.trim()) newErrors.name = "Full name is required";
+        if (!name.trim()) {
+            newErrors.name = "Full name is required";
+        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+            newErrors.name = "Full name can only contain letters and spaces";
+        }
+
+        if (!email.trim()) {
+            newErrors.email = "Email is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            newErrors.email = "Please enter a valid email address";
+        }
 
         if (password.length < 8)
             newErrors.password = "Password must be at least 8 characters";
@@ -20,6 +30,8 @@ export default function useRegister() {
             newErrors.password = "Must contain at least one lowercase letter";
         else if (!/[0-9]/.test(password))
             newErrors.password = "Must contain at least one number";
+        else if (!/[^A-Za-z0-9]/.test(password))
+            newErrors.password = "Must contain at least one special character";
 
         if (password !== confirmPassword)
             newErrors.confirmPassword = "Passwords do not match";
