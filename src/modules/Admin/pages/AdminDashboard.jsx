@@ -89,7 +89,7 @@ export default function AdminDashboard() {
             ) : quizzes.length > 0 ? (
               quizzes.map((quiz) => (
                 <div className="col-12 col-md-6 col-lg-4" key={quiz.id}>
-                  <AdminQuizCard quiz={quiz} />
+                  <AdminQuizCard quiz={quiz} onDeleteSuccess={refetchQuizzes} />
                 </div>
               ))
             ) : (

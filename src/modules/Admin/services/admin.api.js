@@ -23,4 +23,8 @@ export const deleteQuestion = (id) => {
     return api.delete(`questions/${id}`);
 };
 
+export const deleteQuiz = (id) => {
+    return api.delete(`quizzes/${id}`);
+};
+
 

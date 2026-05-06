@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import DifficultyBadge from "../../../shared/components/DifficultyBadge";
+import DeleteQuizButton from "./DeleteQuizButton";
 
 // Admin specific Quiz Card
-export default function AdminQuizCard({ quiz }) {
+export default function AdminQuizCard({ quiz, onDeleteSuccess }) {
     const navigate = useNavigate();
 
     return (
@@ -28,6 +29,10 @@ export default function AdminQuizCard({ quiz }) {
                 >
                     {quiz.description}
                 </p>
+
+                <div className="d-flex justify-content-end mb-2">
+                    <DeleteQuizButton quizId={quiz.id} onDeleteSuccess={onDeleteSuccess} />
+                </div>
 
                 {/* Meta */}
                 <div
