@@ -35,4 +35,10 @@ export const deleteQuiz = (id) => {
     return api.delete(`quizzes/${id}`);
 };
 
+export const updateQuestionOption = (id, data) => {
+    return api.put(`question-options/${id}`, data);
+};
 
+export const deleteQuestionOption = (id) => {
+    return api.delete(`question-options/${id}`);
+};

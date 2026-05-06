@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X as XIcon } from "@phosphor-icons/react";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 export default function QuestionFormBase({
     title,
@@ -7,6 +8,7 @@ export default function QuestionFormBase({
     initialOptions,
     onSubmit,
     onCancel,
+    onDeleteOption,
     loading,
     submitButtonText,
     submitButtonIcon: SubmitIcon,
@@ -25,6 +27,9 @@ export default function QuestionFormBase({
     ];
 
     const [options, setOptions] = useState(defaultOptions);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [optionIndexToDelete, setOptionIndexToDelete] = useState(null);
+    const [isDeletingOption, setIsDeletingOption] = useState(false);
 
     // Reset form when initial data changes (for edit mode)
     useEffect(() => {
@@ -44,12 +49,22 @@ export default function QuestionFormBase({
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Mandatory check: prevent changing type if saved options exist (Update mode)
+        if (name === "question_type" && value !== formData.question_type) {
+            const hasSavedOptions = options.some(opt => opt.id);
+            if (hasSavedOptions) {
+                alert("Please delete all existing options before changing the question type to ensure a clean update.");
+                return;
+            }
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: name === "points" || name === "sort_order" ? Number(value) : value,
         }));
 
-        // Automatically set True/False options if type is changed
+        // Set default options based on new type
         if (name === "question_type") {
             if (value === "TRUE_FALSE") {
                 setOptions([
@@ -84,9 +99,32 @@ export default function QuestionFormBase({
     };
 
     const removeOption = (index) => {
-        if (options.length > 2) {
+        const optionToDelete = options[index];
+
+        if (optionToDelete.id && onDeleteOption) {
+            setOptionIndexToDelete(index);
+            setShowDeleteModal(true);
+        } else {
+            // Allow deleting all options so user can change type
             setOptions(options.filter((_, i) => i !== index));
         }
+    };
+
+    const handleConfirmDeleteOption = async () => {
+        if (optionIndexToDelete === null) return;
+
+        const optionToDelete = options[optionIndexToDelete];
+        setIsDeletingOption(true);
+
+        const result = await onDeleteOption(optionToDelete.id);
+        if (result.success) {
+            setOptions(options.filter((_, i) => i !== optionIndexToDelete));
+            setShowDeleteModal(false);
+            setOptionIndexToDelete(null);
+        } else {
+            alert(result.error || "Failed to delete option.");
+        }
+        setIsDeletingOption(false);
     };
 
     const validateQuestion = () => {
@@ -218,11 +256,12 @@ export default function QuestionFormBase({
                                         disabled={formData.question_type === "TRUE_FALSE"}
                                         required
                                     />
-                                    {formData.question_type === "MCQ" && options.length > 2 && (
+                                    {options.length > 0 && (
                                         <button
                                             className="btn btn-outline-danger"
                                             type="button"
                                             onClick={() => removeOption(idx)}
+                                            title="Delete Option"
                                         >
                                             &times;
                                         </button>
@@ -251,6 +290,15 @@ export default function QuestionFormBase({
                     </button>
                 </form>
             </div>
+
+            <ConfirmDeleteModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={handleConfirmDeleteOption}
+                title="Delete Option"
+                message="Are you sure you want to delete this option permanently? This action cannot be undone."
+                loading={isDeletingOption}
+            />
         </div>
     );
 }

@@ -128,9 +128,10 @@ function resolveQuestions(quizSlice, envelope) {
 }
 
 function normalizeManageOption(opt) {
-    if (opt == null) return { label: "", is_correct: false };
-    if (typeof opt === "string") return { label: opt, is_correct: false };
+    if (opt == null) return { id: null, label: "", is_correct: false };
+    if (typeof opt === "string") return { id: null, label: opt, is_correct: false };
     return {
+        id: opt.id ?? opt._id ?? null,
         label: String(
             opt.label ?? opt.text ?? opt.option_text ?? opt.title ?? opt.value ?? ""
         ),
