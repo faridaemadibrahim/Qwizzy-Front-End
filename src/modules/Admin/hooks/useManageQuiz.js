@@ -310,6 +310,29 @@ export default function useManageQuiz(quizId) {
         }
     };
 
+    /**
+     * Update quiz details (title, description, category, time limit, difficulty, is_published)
+     * @param {Object} data - Quiz data to update
+     */
+    const handleUpdateQuiz = async (data) => {
+        try {
+            setLoading(true);
+            await updateQuiz(quizId, data);
+            setQuiz((prev) => ({
+                ...prev,
+                ...data,
+            }));
+            return { success: true };
+        } catch (err) {
+            return {
+                success: false,
+                error: formatUpdateQuizError(err),
+            };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     /** @param {{ title?: string; category_id?: string | number }} [overrides] — from Manage page inputs when GET omits fields */
 
     const handlePublishQuiz = async (overrides = {}) => {
@@ -375,6 +398,7 @@ export default function useManageQuiz(quizId) {
         creatingQuestion,
         handleAddQuestion,
         handleDeleteQuestion,
+        handleUpdateQuiz,
         handlePublishQuiz,
 
         refresh: fetchQuizDetails

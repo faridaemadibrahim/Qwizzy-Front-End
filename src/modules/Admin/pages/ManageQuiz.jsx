@@ -3,6 +3,7 @@ import { useAuth } from "../../../context/useAuth";
 import QmDashboardNavbar from "../../../shared/components/QmDashboardNavbar";
 import DashboardHeader from "../../../shared/components/DashboardHeader";
 import useManageQuiz from "../hooks/useManageQuiz";
+import QuizEditForm from "../components/QuizEditForm";
 import QuestionForm from "../components/QuestionForm";
 import QuestionsList from "../components/QuestionsList";
 
@@ -18,6 +19,7 @@ export default function ManageQuiz() {
     creatingQuestion,
     handleAddQuestion,
     handleDeleteQuestion,
+    handleUpdateQuiz,
     handlePublishQuiz,
   } = useManageQuiz(id);
 
@@ -47,6 +49,15 @@ export default function ManageQuiz() {
     const result = await handleAddQuestion(data, options);
     if (!result.success) {
       alert(result.error);
+    }
+  };
+
+  const onUpdateQuiz = async (data) => {
+    const result = await handleUpdateQuiz(data);
+    if (!result.success) {
+      alert(result.error);
+    } else {
+      alert("Quiz updated successfully!");
     }
   };
 
@@ -96,6 +107,11 @@ export default function ManageQuiz() {
 
         <div className=" d-flex justify-content-center ">
           <div className="d-flex w-50  flex-column gap-4 box-shadow">
+            <QuizEditForm
+              quiz={quiz}
+              onSubmit={onUpdateQuiz}
+              loading={loading}
+            />
             <QuestionForm onSubmit={onAddQuestion} loading={creatingQuestion} />
             <QuestionsList
               questions={questions}
