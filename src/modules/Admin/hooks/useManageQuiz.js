@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
 import { getQuizById, getQuestionsByQuizId } from "../../Quiz/services/quizService";
-import { createQuestion, updateQuiz, createQuestionOption, getOptionsByQuestionId, deleteQuestion } from "../services/admin.api";
+import { createQuestion, updateQuiz, createQuestionOption, deleteQuestion } from "../services/admin.api";
 
 function formatUpdateQuizError(err) {
     const body = err?.response?.data;
@@ -198,25 +198,14 @@ export default function useManageQuiz(quizId) {
             }
             setQuiz(quizData);
 
-            // 2. Fetch Questions (Optional fallback)
+            // 2. Fetch Questions (now includes options nested)
             let questionRows = [];
             try {
                 const questionsResponse = await getQuestionsByQuizId(requestedId);
                 const questionsBody = questionsResponse?.data?.data || questionsResponse?.data || [];
 
                 if (Array.isArray(questionsBody) && questionsBody.length > 0) {
-                    const questionsWithOpts = await Promise.all(
-                        questionsBody.map(async (q) => {
-                            try {
-                                const optRes = await getOptionsByQuestionId(q.id);
-                                const optsData = optRes.data?.data || optRes.data || [];
-                                return { ...q, options: Array.isArray(optsData) ? optsData : [] };
-                            } catch {
-                                return { ...q, options: [] };
-                            }
-                        })
-                    );
-                    questionRows = questionsWithOpts.map(normalizeManageQuestion);
+                    questionRows = questionsBody.map(normalizeManageQuestion);
                 } else {
                     const envelope = quizResponse?.data && typeof quizResponse.data === "object" ? quizResponse.data : {};
                     questionRows = resolveQuestions(quizData, envelope).map(normalizeManageQuestion);
