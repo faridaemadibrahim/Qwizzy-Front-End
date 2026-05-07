@@ -1,4 +1,4 @@
-import QuestionFormBase from "../../../shared/components/QuestionFormBase";
+import QuestionFormBase from "./QuestionFormBase";
 
 export default function QuestionForm({ onSubmit, loading, onCancel }) {
     const handleSubmit = (formData, options) => {
