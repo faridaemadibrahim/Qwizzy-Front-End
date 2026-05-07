@@ -55,7 +55,7 @@ export default function useGetQuizById(id) {
                   id: q.id,
                   text: q.body || q.question_text || q.text || "",
                   type: q.question_type || "MCQ",
-                  options: opts.map(o => o.label || o.text || ""),
+                  options: opts.map(o => ({ id: o.id, label: o.label || o.text || "" })),
                   sort_order: q.sort_order || 0
                 };
               } catch (err) {

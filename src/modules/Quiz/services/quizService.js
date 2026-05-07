@@ -23,3 +23,7 @@ export const getQuestionsByQuizId = (id) => {
     return api.get(`/questions/quiz/${id}`);
 };
 
+export const submitQuizAttempt = (data) => {
+    return api.post("/quiz-attempts/submit", data);
+};
+

@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../../../context/useAuth";
 import QmDashboardNavbar from "../../../shared/components/QmDashboardNavbar";
 import DashboardHeader from "../../../shared/components/DashboardHeader";
 import useManageQuiz from "../hooks/useManageQuiz";
+import QuizEditForm from "../components/QuizEditForm";
 import QuestionForm from "../components/QuestionForm";
 import QuestionsList from "../components/QuestionsList";
 
@@ -10,6 +12,7 @@ export default function ManageQuiz() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
   const {
     quiz,
     questions,
@@ -18,7 +21,9 @@ export default function ManageQuiz() {
     creatingQuestion,
     handleAddQuestion,
     handleDeleteQuestion,
+    handleUpdateQuiz,
     handlePublishQuiz,
+    refresh,
   } = useManageQuiz(id);
 
   if (loading && !quiz) {
@@ -47,6 +52,27 @@ export default function ManageQuiz() {
     const result = await handleAddQuestion(data, options);
     if (!result.success) {
       alert(result.error);
+    } else {
+      // Hide form after successful creation
+      setShowQuestionForm(false);
+    }
+  };
+
+  const onUpdateQuestion = async () => {
+    // Refresh the quiz data to show updated question
+    await refresh();
+  };
+
+  const handleAddClick = () => {
+    setShowQuestionForm(true);
+  };
+
+  const onUpdateQuiz = async (data) => {
+    const result = await handleUpdateQuiz(data);
+    if (!result.success) {
+      alert(result.error);
+    } else {
+      alert("Quiz updated successfully!");
     }
   };
 
@@ -96,10 +122,23 @@ export default function ManageQuiz() {
 
         <div className=" d-flex justify-content-center ">
           <div className="d-flex w-50  flex-column gap-4 box-shadow">
-            <QuestionForm onSubmit={onAddQuestion} loading={creatingQuestion} />
+            <QuizEditForm
+              quiz={quiz}
+              onSubmit={onUpdateQuiz}
+              loading={loading}
+            />
+            {(showQuestionForm || questions.length === 0) && (
+              <QuestionForm
+                onSubmit={onAddQuestion}
+                loading={creatingQuestion}
+                onCancel={questions.length > 0 ? () => setShowQuestionForm(false) : undefined}
+              />
+            )}
             <QuestionsList
               questions={questions}
               onDelete={handleDeleteQuestion}
+              onUpdate={onUpdateQuestion}
+              onAddClick={handleAddClick}
             />
           </div>
         </div>

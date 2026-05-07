@@ -128,9 +128,10 @@ function resolveQuestions(quizSlice, envelope) {
 }
 
 function normalizeManageOption(opt) {
-    if (opt == null) return { label: "", is_correct: false };
-    if (typeof opt === "string") return { label: opt, is_correct: false };
+    if (opt == null) return { id: null, label: "", is_correct: false };
+    if (typeof opt === "string") return { id: null, label: opt, is_correct: false };
     return {
+        id: opt.id ?? opt._id ?? null,
         label: String(
             opt.label ?? opt.text ?? opt.option_text ?? opt.title ?? opt.value ?? ""
         ),
@@ -295,8 +296,6 @@ export default function useManageQuiz(quizId) {
 
 
     const handleDeleteQuestion = async (questionId) => {
-        if (!window.confirm("Are you sure you want to delete this question?")) return;
-
         try {
             setLoading(true);
             await deleteQuestion(questionId);
@@ -306,6 +305,29 @@ export default function useManageQuiz(quizId) {
             return {
                 success: false,
                 error: err.response?.data?.message || "Failed to delete question",
+            };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /**
+     * Update quiz details (title, description, category, time limit, difficulty, is_published)
+     * @param {Object} data - Quiz data to update
+     */
+    const handleUpdateQuiz = async (data) => {
+        try {
+            setLoading(true);
+            await updateQuiz(quizId, data);
+            setQuiz((prev) => ({
+                ...prev,
+                ...data,
+            }));
+            return { success: true };
+        } catch (err) {
+            return {
+                success: false,
+                error: formatUpdateQuizError(err),
             };
         } finally {
             setLoading(false);
@@ -377,6 +399,7 @@ export default function useManageQuiz(quizId) {
         creatingQuestion,
         handleAddQuestion,
         handleDeleteQuestion,
+        handleUpdateQuiz,
         handlePublishQuiz,
 
         refresh: fetchQuizDetails
