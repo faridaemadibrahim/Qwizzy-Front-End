@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getQuizById } from "../services/quizService.js";
-import { getOptionsByQuestionId } from "../../Admin/services/admin.api";
 
 function normalizeQuiz(data, fullQuestions = []) {
   if (!data) return null;
@@ -45,31 +44,16 @@ export default function useGetQuizById(id) {
         const questionRows = Array.isArray(rawData) ? rawData : (rawData.questions_list || []);
         
         if (questionRows.length > 0) {
-          // Fetch options for each question
-          const fullQuestions = await Promise.all(
-            questionRows.map(async (q) => {
-              try {
-                const optRes = await getOptionsByQuestionId(q.id);
-                const opts = optRes.data?.data || optRes.data || [];
-                return {
-                  id: q.id,
-                  text: q.body || q.question_text || q.text || "",
-                  type: q.question_type || "MCQ",
-                  options: opts.map(o => ({ id: o.id, label: o.label || o.text || "" })),
-                  sort_order: q.sort_order || 0
-                };
-              } catch (err) {
-                console.error("Failed to fetch options for question", q.id, err);
-                return {
-                  id: q.id,
-                  text: q.body || q.question_text || q.text || "",
-                  type: q.question_type || "MCQ",
-                  options: [],
-                  sort_order: q.sort_order || 0
-                };
-              }
-            })
-          );
+          const fullQuestions = questionRows.map((q) => {
+            const opts = q.options ?? q.question_options ?? q.answers ?? [];
+            return {
+              id: q.id,
+              text: q.body || q.question_text || q.text || "",
+              type: q.question_type || "MCQ",
+              options: opts.map(o => ({ id: o.id, label: o.label || o.text || "" })),
+              sort_order: q.sort_order || 0
+            };
+          });
           
           setQuiz(normalizeQuiz(rawData, fullQuestions.sort((a, b) => a.sort_order - b.sort_order)));
         } else {
