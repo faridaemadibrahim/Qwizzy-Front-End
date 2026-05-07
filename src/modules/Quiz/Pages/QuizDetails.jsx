@@ -1,7 +1,8 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import useGetQuizById from "../hooks/useGetQuizById";
 import useSubmitQuiz from "../hooks/useSubmitQuiz";
+import useQuizSession from "../hooks/useQuizSession";
 import { useAuth } from "../../../context/useAuth.jsx";
 import "../styles/QuizPlay.css";
 
@@ -9,25 +10,44 @@ export default function QuizDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { quiz, loading, error } = useGetQuizById(id);
   const { handleSubmit: submitQuiz, loading: submitting } = useSubmitQuiz();
+  const { quiz, loading, error } = useGetQuizById(id);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default
+  const questions = useMemo(() => quiz?.questionsList || [], [quiz]);
 
-  useEffect(() => {
-    if (quiz?.duration) {
-      setTimeLeft(quiz.duration * 60);
+  const handleFinalSubmit = async (answersState) => {
+    const answers = questions.map((q, idx) => ({
+      question_id: q.id,
+      selected_option_id: answersState[idx]?.id || null,
+    }));
+
+    const result = await submitQuiz(quiz.id, answers);
+    if (result.success) {
+      navigate(`/quiz/${id}/result`, {
+        state: { resultData: result.data, quizTitle: quiz.title },
+        replace: true,
+      });
+      return true;
+    } else {
+      alert(result.error || "Failed to submit quiz.");
+      return false;
     }
-  }, [quiz]);
+  };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const {
+    currentIndex,
+    selectedAnswers,
+    timeLeft,
+    handleOptionSelect,
+    nextQuestion,
+    prevQuestion,
+    goToQuestion,
+  } = useQuizSession({
+    quizId: id,
+    quizDuration: quiz?.duration,
+    totalQuestions: questions.length,
+    onSubmit: handleFinalSubmit
+  });
 
   if (!user && !loading) {
     return <Navigate to="/login" replace />;
@@ -43,10 +63,12 @@ export default function QuizDetails() {
     );
   }
 
-  if (error || !quiz) {
+  if (error || !quiz || questions.length === 0) {
     return (
       <div className="container py-5 text-center">
-        <div className="alert alert-danger">{error || "Quiz not found."}</div>
+        <div className="alert alert-danger">
+          {error || (questions.length === 0 ? "This quiz has no questions." : "Quiz not found.")}
+        </div>
         <button
           className="btn btn-qm-primary"
           onClick={() => navigate("/quizzes")}
@@ -57,58 +79,6 @@ export default function QuizDetails() {
     );
   }
 
-  // Fallback questions if none provided by API yet
-  const questions =
-    quiz.questionsList?.length > 0
-      ? quiz.questionsList
-      : [
-          {
-            id: 1,
-            text: "What is the correct syntax to declare a variable in JavaScript?",
-            type: "Multiple Choice",
-            options: [
-              "var x = 5;",
-              "variable x = 5;",
-              "v x = 5;",
-              "declare x = 5;",
-            ],
-          },
-          {
-            id: 2,
-            text: "Which company developed JavaScript?",
-            type: "Multiple Choice",
-            options: ["Netscape", "Microsoft", "Sun Microsystems", "Oracle"],
-          },
-          {
-            id: 3,
-            text: "Which of the following is a JavaScript data type?",
-            type: "Multiple Choice",
-            options: ["String", "Number", "Boolean", "All of the above"],
-          },
-          {
-            id: 4,
-            text: "How do you write 'Hello World' in an alert box?",
-            type: "Multiple Choice",
-            options: [
-              "msgBox('Hello World');",
-              "alert('Hello World');",
-              "msg('Hello World');",
-              "alertBox('Hello World');",
-            ],
-          },
-          {
-            id: 5,
-            text: "How do you create a function in JavaScript?",
-            type: "Multiple Choice",
-            options: [
-              "function:myFunction()",
-              "function myFunction()",
-              "function = myFunction()",
-              "myFunction():function",
-            ],
-          },
-        ];
-
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
@@ -116,26 +86,6 @@ export default function QuizDetails() {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const handleOptionSelect = (option) => {
-    setSelectedAnswers({ ...selectedAnswers, [currentIndex]: option });
-  };
-
-  const handleSubmitQuiz = async () => {
-    const answers = questions.map((q, idx) => ({
-      question_id: q.id,
-      selected_option_id: selectedAnswers[idx]?.id || null,
-    }));
-
-    const result = await submitQuiz(quiz.id, answers);
-    if (result.success) {
-      navigate(`/quiz/${id}/result`, {
-        state: { resultData: result.data, quizTitle: quiz.title },
-      });
-    } else {
-      alert(result.error || "Failed to submit quiz.");
-    }
   };
 
   return (
@@ -166,8 +116,8 @@ export default function QuizDetails() {
       <div className="container py-4">
         {/* Question Card */}
         <div className="question-card">
-          <h1 className="question-text">{currentQuestion.text}</h1>
-          <p className="question-type">Question Type: {currentQuestion.type}</p>
+          <h1 className="question-text">{currentQuestion.text || currentQuestion.body}</h1>
+          <p className="question-type">Question Type: {currentQuestion.type || currentQuestion.question_type}</p>
 
           <div className="options-container mb-5">
             {currentQuestion.options.map((option, idx) => (
@@ -191,7 +141,7 @@ export default function QuizDetails() {
             <button
               className="btn nav-btn btn-prev"
               disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex((prev) => prev - 1)}
+              onClick={prevQuestion}
             >
               <span>⟨</span> Previous
             </button>
@@ -217,7 +167,7 @@ export default function QuizDetails() {
                     className={`dot ${currentIndex === idx ? "active" : ""} ${
                       selectedAnswers[idx] ? "completed" : ""
                     }`}
-                    onClick={() => setCurrentIndex(idx)}
+                    onClick={() => goToQuestion(idx)}
                   >
                     {idx + 1}
                   </div>
@@ -230,13 +180,7 @@ export default function QuizDetails() {
             <button
               className="btn nav-btn btn-next"
               disabled={submitting}
-              onClick={() => {
-                if (currentIndex < questions.length - 1) {
-                  setCurrentIndex((prev) => prev + 1);
-                } else {
-                  handleSubmitQuiz();
-                }
-              }}
+              onClick={nextQuestion}
             >
               {submitting ? (
                 <span className="spinner-border spinner-border-sm me-2"></span>

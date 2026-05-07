@@ -4,16 +4,18 @@ import { deleteQuiz } from "../services/admin.api";
 export default function useDeleteQuiz() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
+    const openModal = () => setShowModal(true);
+    const closeModal = () => setShowModal(false);
 
     const handleDeleteQuiz = useCallback(async (id, onSuccess) => {
         setLoading(true);
         setError(null);
-        setSuccess(false);
 
         try {
             await deleteQuiz(id);
-            setSuccess(true);
+            closeModal();
             
             if (onSuccess) {
                 onSuccess(id);
@@ -34,8 +36,9 @@ export default function useDeleteQuiz() {
         handleDeleteQuiz, 
         loading, 
         error, 
-        success,
-        setError,
-        setSuccess
+        showModal,
+        openModal,
+        closeModal,
+        setError
     };
 }
