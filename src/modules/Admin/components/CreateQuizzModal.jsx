@@ -139,19 +139,6 @@ export default function CreateQuizzModal({
                                 </div>
                             </div>
 
-                            <div className="mb-4 d-flex align-items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="is_published"
-                                    name="is_published"
-                                    className="form-check-input"
-                                    checked={formData.is_published}
-                                    onChange={onChange}
-                                />
-                                <label htmlFor="is_published" className="form-check-label small mt-1">
-                                    Publish immediately
-                                </label>
-                            </div>
 
                             <button
                                 type="submit"
