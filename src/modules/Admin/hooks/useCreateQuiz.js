@@ -66,11 +66,12 @@ export default function useCreateQuiz(show, onHide, onSuccess) {
                 description,
                 category_id: String(category_id).trim(),
                 time_limit_minutes: Number.parseInt(String(formData.time_limit_minutes), 10) || 5,
+                is_published: false,
             };
 
             await createQuiz(payload);
             setSuccess(true);
-            
+
             // Auto-close modal after success
             setTimeout(() => {
                 onSuccess?.();
@@ -91,12 +92,12 @@ export default function useCreateQuiz(show, onHide, onSuccess) {
         }
     };
 
-    return { 
-        formData, 
-        handleChange, 
-        handleSubmit, 
-        loading, 
-        error, 
+    return {
+        formData,
+        handleChange,
+        handleSubmit,
+        loading,
+        error,
         success,
         setError,
         setSuccess
