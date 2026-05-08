@@ -19,6 +19,7 @@ export default function ResetPasswordCard() {
     handleSubmit,
   } = useResetPassword();
 
+
   // Strength checker
   const hasLen = newPassword.length >= 8;
   const hasUpper = /[A-Z]/.test(newPassword);
