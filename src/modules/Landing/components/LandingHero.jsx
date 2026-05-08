@@ -13,9 +13,9 @@ export default function LandingHero() {
           {hero.subtitle}
         </p>
         <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-          <a className="btn btn-qm-primary btn-lg rounded-pill px-4" href="#start">
+          <Link className="btn btn-qm-primary btn-lg rounded-pill px-4" to="/register">
             {hero.primaryCta}
-          </a>
+          </Link>
           <Link className="btn btn-qm-outline btn-lg rounded-pill px-4" to="/login">
             {hero.secondaryCta}
           </Link>
