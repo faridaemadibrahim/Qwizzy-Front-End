@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import LandingPage from "./modules/Landing/pages/LandingPage.jsx";
-import Login from "./modules/auth/pages/Login.jsx";
+import Login from "./modules/auth/pages/login.jsx";
 import ForgetPassword from "./modules/auth/pages/ForgetPassword.jsx";
 import ResetPassword from "./modules/auth/pages/ResetPassword.jsx";
 import RootLayout from "./layouts/RootLayout.jsx";
-import Register from "./modules/auth/pages/Register.jsx";
+import Register from "./modules/auth/pages/register.jsx";
 import VerifyEmail from "./modules/auth/pages/VerifyEmail.jsx";
 import QuizzesList from "./modules/Quiz/Pages/QuizzesList.jsx";
 import QuizDetails from "./modules/Quiz/Pages/QuizDetails.jsx";
