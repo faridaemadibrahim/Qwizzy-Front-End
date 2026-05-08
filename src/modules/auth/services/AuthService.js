@@ -15,3 +15,8 @@ export const forgotPassword = (email) => {
 export const resetPassword = (payload) => {
   return api.post("/users/reset-password", payload);
 };
+
+export const verifyForgotCode = (payload) => {
+  return api.post("/users/verify-forgot-password-code", payload);
+};
+
