@@ -98,12 +98,12 @@ export default function QuizDetails() {
               {quiz.title}
             </h2>
             <p className="text-muted mb-0 small">
-              Question {currentIndex + 1} of {questions.length}
+              Question {currentIndex + 1} of {questions.length} • {quiz.duration} mins
             </p>
           </div>
           <div className="timer-display">
             <span style={{ fontSize: "1.2rem", marginRight: "8px" }}>🕒</span>
-            {formatTime(timeLeft)}
+            {timeLeft >= 0 ? formatTime(timeLeft) : "--:--"}
           </div>
         </div>
       </div>
