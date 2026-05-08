@@ -18,7 +18,7 @@ export default function useForgetPassword() {
       setLoading(true);
       await forgotPassword(email);
       setSuccess("Reset request sent successfully.");
-      navigate("/reset-password", { state: { email } });
+      navigate("/verify-forgot-password-code", { state: { email } });
     } catch (err) {
       setError(err.response?.data?.message || "Failed to send reset request.");
     } finally {

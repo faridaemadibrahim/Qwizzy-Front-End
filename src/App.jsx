@@ -7,6 +7,7 @@ import ResetPassword from "./modules/auth/pages/ResetPassword.jsx";
 import RootLayout from "./layouts/RootLayout.jsx";
 import Register from "./modules/auth/pages/register.jsx";
 import VerifyEmail from "./modules/auth/pages/VerifyEmail.jsx";
+import VerifyForgotCode from "./modules/auth/pages/VerifyForgotCode.jsx";
 import QuizzesList from "./modules/Quiz/Pages/QuizzesList.jsx";
 import QuizDetails from "./modules/Quiz/Pages/QuizDetails.jsx";
 import QuizResult from "./modules/Quiz/Pages/QuizResult.jsx";
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify-forgot-password-code" element={<VerifyForgotCode />} />
         </Route>
         <Route path="/quizzes" element={<QuizzesList />} />
         <Route path="/quiz/:id" element={<QuizDetails />} />

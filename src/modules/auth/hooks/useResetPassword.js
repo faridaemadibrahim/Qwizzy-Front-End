@@ -11,6 +11,10 @@ export default function useResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const email = location.state?.email;
+    const code = location.state?.code;
+
+
     async function handleSubmit(event) {
         event.preventDefault();
         setError("");
@@ -39,17 +43,20 @@ export default function useResetPassword() {
 
         try {
             setLoading(true);
-            const email = location.state?.email;
-            if (!email) {
-                setError("Missing email. Please request reset code again.");
+            
+            if (!email || !code) {
+                setError("Session expired. Please request reset code again.");
                 return;
             }
 
+            // The code was already verified in the previous step.
+            // Backend validation says "code" is not allowed here.
             await resetPassword({ email, newPassword });
+            
             setSuccess("Password reset successfully! Redirecting...");
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || "Error occurred");
+            setError(err.response?.data?.message || "Error occurred while resetting password");
         } finally {
             setLoading(false);
         }
